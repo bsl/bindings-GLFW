@@ -250,11 +250,11 @@ test_glfwGetGammaRamp p'mon = do
       then assertFailure ""
       else do
           gr <- peek p'gr
-          let cn   = c'GLFWgammaramp'size  gr
-              p'rs = c'GLFWgammaramp'red   gr
+          let p'rs = c'GLFWgammaramp'red   gr
               p'gs = c'GLFWgammaramp'green gr
               p'bs = c'GLFWgammaramp'blue  gr
-              n = fromIntegral cn
+              cn   = c'GLFWgammaramp'size  gr
+              n    = fromIntegral cn
           if nullPtr `elem` [p'rs, p'gs, p'bs]
             then assertFailure ""
             else do
