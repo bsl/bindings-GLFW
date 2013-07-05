@@ -68,6 +68,9 @@ library
   exposed-modules:
     Bindings.GLFW
 
+  build-tools:
+    hsc2hs
+
   build-depends:
     base          < 5,
     bindings-DSL == 1.0.*
