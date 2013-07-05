@@ -41,6 +41,20 @@ extra-source-files:
 
 --------------------------------------------------------------------------------
 
+flag MacOSXUseChdir
+  description:
+    Mac OS X only. Determines whether 'init' changes the current directory of
+    bundled applications to the 'Contents/Resources' directory.
+  default: True
+
+flag MacOSXUseMenubar
+  description:
+    Mac OS X only. Determines whether the first call to 'createWindow' sets up
+    a minimal menu bar.
+  default: True
+
+--------------------------------------------------------------------------------
+
 library
   default-language: Haskell2010
 
@@ -98,6 +112,10 @@ library
       pthread
   else
     if os(darwin)
+      if !flag(MacOSXUseChdir)
+        cc-options: -UGLFW_USE_CHDIR
+      if !flag(MacOSXUseMenubar)
+        cc-options: -UGLFW_USE_MENUBAR
       extra-libraries: glfw
       extra-lib-dirs: build
       ghc-options: -fPIC
