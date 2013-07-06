@@ -10,15 +10,15 @@ license-file: LICENSE
 
 synopsis:     Low-level bindings to GLFW OpenGL library
 description:
-  Low-level bindings to GLFW, an Open Source, multi-platform library for
-  creating windows with OpenGL contexts and managing input and events. See
-  <http://www.glfw.org/>.
+  Low-level bindings to <http://www.glfw.org/ GLFW>, an open source,
+  multi-platform library for creating windows with OpenGL contexts and managing
+  input and events.
   .
-  The bound version of GLFW is 3.0.1, released 2013-06-17. See
-  <http://www.glfw.org/Version-3.0.1-released.html>.
+  The binding is to
+  <http://www.glfw.org/Version-3.0.1-released.html GLFW 3.0.1, released 2013-06-17>.
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
-  see GLFW-b: <http://hackage.haskell.org/package/GLFW-b>.
+  see <http://hackage.haskell.org/package/GLFW-b GLFW-b>.
 
 cabal-version: >= 1.10
 build-type:    Custom
@@ -26,6 +26,8 @@ build-type:    Custom
 --------------------------------------------------------------------------------
 
 extra-source-files:
+  README.md
+
   Makefile
   build/glfw/lib/cocoa/.build-tag
 
@@ -91,8 +93,6 @@ library
 
   if os(linux) || os(freebsd)
     include-dirs:
-      -- Note: glfw/include/os/unix-like/config.h is the config.h created by
-      --       CMake on my Linux system
       glfw/include/os/unix-like
     c-sources:
       glfw/src/x11_clipboard.c
