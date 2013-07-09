@@ -1,8 +1,8 @@
-Low-level [Haskell][1] bindings to [GLFW][2], an Open Source, multi-platform
+Low-level [Haskell][1] bindings to [GLFW][2], an open source, multi-platform
 library for creating windows with OpenGL contexts and managing input and
 events.
 
-The bound version of GLFW is 3.0.1, [released 2013-06-17][3].
+The binding is to [GLFW 3.0.1, released 2013-06-17][3].
 
 *These bindings are too low-level for normal use.* For higher-level GLFW
 bindings, see [GLFW-b][4].
