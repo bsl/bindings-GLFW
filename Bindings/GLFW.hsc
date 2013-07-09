@@ -1,7 +1,6 @@
-{-# LANGUAGE DeriveDataTypeable       #-}
-{-# LANGUAGE ForeignFunctionInterface #-}
-{-# LANGUAGE NoImplicitPrelude        #-}
-{-# LANGUAGE StandaloneDeriving       #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 --------------------------------------------------------------------------------
 
