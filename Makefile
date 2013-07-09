@@ -28,13 +28,12 @@ $(BUILD_DIR)/libglfw.dylib: $(OBJS)
         -current_version 1                                      \
         $(GLFW_FLAG) -o $@ $(OBJS) $(GLFW_SRC) $(FRAMEWORK)
 
-.PHONY: $(BUILD_DIR)/$(SRC_DIR)/.build-tag
+.PHONY: $(BUILD_DIR)/$(SRC_DIR)
 
-$(BUILD_DIR)/$(SRC_DIR)/.build-tag:
+$(BUILD_DIR)/$(SRC_DIR):
 	mkdir -p $(BUILD_DIR)/$(SRC_DIR)
-	touch $@
 
-$(OBJS): $(BUILD_DIR)/$(SRC_DIR)/.build-tag
+$(OBJS): | $(BUILD_DIR)/$(SRC_DIR)
 
 $(BUILD_DIR)/%.o: %.c
 	$(CC) -c $(GLFW_FLAG) $< -o $@
