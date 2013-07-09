@@ -2,8 +2,8 @@ GHC       := ghc -ignore-dot-ghci
 GCCFLAGS  := $(shell $(GHC) --info | $(GHC) -e "fmap read getContents >>= \
              putStrLn . unwords . read . Data.Maybe.fromJust . lookup     \
              \"Gcc Linker flags\"")
-FRAMEWORK := -framework Cocoa -framework OpenGL
-GLFW_FLAG := $(GCCFLAGS) -O2 -msse2 -fno-common -Iglfw/include -Iglfw/src $(CFLAGS)
+FRAMEWORK := -framework AGL -framework Cocoa -framework OpenGL -framework IOKit -framework CoreFoundation
+GLFW_FLAG := $(GCCFLAGS) -O2 -msse2 -fno-common -Iglfw/include/os/darwin -Iglfw/include -Iglfw/src $(CFLAGS)
 SRC_DIR   := glfw/src
 BUILD_DIR := build
 
@@ -13,7 +13,6 @@ GLFW_SRC  :=               \
   $(SRC_DIR)/clipboard.c   \
   $(SRC_DIR)/context.c     \
   $(SRC_DIR)/gamma.c       \
-  $(SRC_DIR)/glx_context.c \
   $(SRC_DIR)/init.c        \
   $(SRC_DIR)/input.c       \
   $(SRC_DIR)/joystick.c    \
