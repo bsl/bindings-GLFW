@@ -1,4 +1,6 @@
 *.[oa]
 *.dylib
+.*.swp
+.*.swo
 cabal-dev/
 dist/
