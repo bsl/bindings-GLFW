@@ -29,7 +29,6 @@ extra-source-files:
   README.md
 
   Makefile
-  build/glfw/lib/cocoa/.build-tag
 
   glfw/deps/EGL/*.h
   glfw/deps/GL/*.h
