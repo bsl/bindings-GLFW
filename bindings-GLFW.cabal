@@ -35,6 +35,7 @@ extra-source-files:
   glfw/deps/GL/*.h
 
   glfw/include/os/unix-like/*.h
+  glfw/include/os/windows/*.h
   glfw/include/GLFW/*.h
 
   glfw/src/*.c
@@ -89,7 +90,6 @@ library
       glfw/src/monitor.c
       glfw/src/time.c
       glfw/src/window.c
-      glfw/src/glx_context.c
 
   if os(linux) || os(freebsd)
     include-dirs:
@@ -103,6 +103,7 @@ library
       glfw/src/x11_time.c
       glfw/src/x11_unicode.c
       glfw/src/x11_window.c
+      glfw/src/glx_context.c
     extra-libraries:
       GL
       X11
@@ -110,27 +111,31 @@ library
       Xrandr
       Xxf86vm
       pthread
-  else
-    if os(darwin)
-      if !flag(MacOSXUseChdir)
-        cc-options: -UGLFW_USE_CHDIR
-      if !flag(MacOSXUseMenubar)
-        cc-options: -UGLFW_USE_MENUBAR
-      extra-libraries: glfw
-      extra-lib-dirs: build
-      ghc-options: -fPIC
-    else
-      if os(mingw32)
-        c-sources:
-          glfw/src/win32_clipboard.c
-          glfw/src/win32_gamma.c
-          glfw/src/win32_init.c
-          glfw/src/win32_joystick.c
-          glfw/src/win32_monitor.c
-          glfw/src/win32_time.c
-          glfw/src/win32_window.c
-        extra-libraries:
-          opengl32
+
+  if os(darwin)
+    if !flag(MacOSXUseChdir)
+      cc-options: -UGLFW_USE_CHDIR
+    if !flag(MacOSXUseMenubar)
+      cc-options: -UGLFW_USE_MENUBAR
+    extra-libraries: glfw
+    extra-lib-dirs: build
+    ghc-options: -fPIC
+
+  if os(mingw32)
+    include-dirs:
+      glfw/include/os/windows
+    c-sources:
+      glfw/src/win32_clipboard.c
+      glfw/src/win32_gamma.c
+      glfw/src/win32_init.c
+      glfw/src/win32_joystick.c
+      glfw/src/win32_monitor.c
+      glfw/src/win32_time.c
+      glfw/src/win32_window.c
+      glfw/src/wgl_context.c
+    extra-libraries:
+      opengl32
+      Gdi32
 
 --------------------------------------------------------------------------------
 
