@@ -21,7 +21,7 @@ description:
   see <http://hackage.haskell.org/package/GLFW-b GLFW-b>.
 
 cabal-version: >= 1.10
-build-type:    Custom
+build-type:    Simple
 
 --------------------------------------------------------------------------------
 
