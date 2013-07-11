@@ -127,7 +127,6 @@ library
       cc-options: -UGLFW_USE_CHDIR
     if !flag(MacOSXUseMenubar)
       cc-options: -UGLFW_USE_MENUBAR
-    ghc-options: -fPIC -Lbuild -framework glfw
     frameworks: AGL Cocoa OpenGL IOKit CoreFoundation
 
   if os(mingw32)
