@@ -79,17 +79,16 @@ library
     glfw/include
     glfw/src
 
-  if !os(darwin)
-    c-sources:
-      glfw/src/clipboard.c
-      glfw/src/context.c
-      glfw/src/gamma.c
-      glfw/src/init.c
-      glfw/src/input.c
-      glfw/src/joystick.c
-      glfw/src/monitor.c
-      glfw/src/time.c
-      glfw/src/window.c
+  c-sources:
+    glfw/src/clipboard.c
+    glfw/src/context.c
+    glfw/src/gamma.c
+    glfw/src/init.c
+    glfw/src/input.c
+    glfw/src/joystick.c
+    glfw/src/monitor.c
+    glfw/src/time.c
+    glfw/src/window.c
 
   if os(linux) || os(freebsd)
     include-dirs:
@@ -118,16 +117,18 @@ library
     c-sources:
        glfw/src/cocoa_clipboard.m
        glfw/src/cocoa_init.m
+       glfw/src/cocoa_gamma.c
+       glfw/src/cocoa_time.c
        glfw/src/cocoa_joystick.m
        glfw/src/cocoa_monitor.m
        glfw/src/cocoa_window.m
+       glfw/src/nsgl_context.m
     if !flag(MacOSXUseChdir)
       cc-options: -UGLFW_USE_CHDIR
     if !flag(MacOSXUseMenubar)
       cc-options: -UGLFW_USE_MENUBAR
-    extra-libraries: glfw
-    extra-lib-dirs: build
-    ghc-options: -fPIC
+    ghc-options: -fPIC -Lbuild -framework glfw
+    frameworks: AGL Cocoa OpenGL IOKit CoreFoundation
 
   if os(mingw32)
     include-dirs:
