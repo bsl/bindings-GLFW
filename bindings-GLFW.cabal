@@ -32,8 +32,6 @@ build-type:    Simple
 extra-source-files:
   README.md
 
-  Makefile
-
   glfw/deps/EGL/*.h
   glfw/deps/GL/*.h
 
