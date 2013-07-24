@@ -14,6 +14,7 @@ module Bindings.GLFW where
 import Prelude (Eq, IO, Num, Show)
 import Prelude (($), return)
 
+import Data.Data        (Data)
 import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
@@ -261,9 +262,11 @@ import Foreign.Storable (Storable(..))
 
 #opaque_t GLFWmonitor
 deriving instance Typeable C'GLFWmonitor
+deriving instance Data     C'GLFWmonitor
 
 #opaque_t GLFWwindow
 deriving instance Typeable C'GLFWwindow
+deriving instance Data     C'GLFWwindow
 
 #callback GLFWerrorfun           , CInt -> Ptr CChar ->                                IO ()
 #callback GLFWwindowposfun       , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
