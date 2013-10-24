@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      0.1.0
+version:      3.0.3
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -15,7 +15,8 @@ description:
   input and events.
   .
   The binding is to
-  <http://www.glfw.org/Version-3.0.1-released.html GLFW 3.0.1, released 2013-06-17>.
+  <http://www.glfw.org/Version-3.0.3-released.html GLFW 3.0.3, released 2013-09-24>.
+  http://www.glfw.org/changelog.html
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
   see <http://hackage.haskell.org/package/GLFW-b GLFW-b>.
@@ -129,7 +130,7 @@ library
       cc-options: -UGLFW_USE_CHDIR
     if !flag(MacOSXUseMenubar)
       cc-options: -UGLFW_USE_MENUBAR
-    frameworks: AGL Cocoa OpenGL IOKit CoreFoundation
+    frameworks: AGL Cocoa OpenGL IOKit CoreFoundation CoreVideo
 
   if os(mingw32)
     include-dirs:
@@ -158,10 +159,12 @@ test-suite main
 
   type: exitcode-stdio-1.0
   main-is: Test.hs
+  frameworks: AGL Cocoa OpenGL IOKit CoreFoundation CoreVideo
+
   build-depends:
     HUnit                == 1.2.*,
     base                  < 5,
-    bindings-GLFW        == 0.0.*,
+    bindings-GLFW        == 3.0.3,
     test-framework       == 0.8.*,
     test-framework-hunit == 0.3.*
 

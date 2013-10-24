@@ -1,8 +1,5 @@
 //========================================================================
-// GLFW - An OpenGL library
-// Platform:    Cocoa
-// API version: 3.0
-// WWW:         http://www.glfw.org/
+// GLFW 3.0 OS X - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
@@ -58,7 +55,7 @@ static const char* getDisplayName(CGDirectDisplayID displayID)
 
     size = CFStringGetMaximumSizeForEncoding(CFStringGetLength(value),
                                              kCFStringEncodingUTF8);
-    name = (char*) malloc(size + 1);
+    name = calloc(size + 1, sizeof(char));
     CFStringGetCString(value, name, size, kCFStringEncodingUTF8);
 
     CFRelease(info);
@@ -253,8 +250,8 @@ _GLFWmonitor** _glfwPlatformGetMonitors(int* count)
 
     CGGetActiveDisplayList(0, NULL, &monitorCount);
 
-    displays = (CGDirectDisplayID*) calloc(monitorCount, sizeof(CGDirectDisplayID));
-    monitors = (_GLFWmonitor**) calloc(monitorCount, sizeof(_GLFWmonitor*));
+    displays = calloc(monitorCount, sizeof(CGDirectDisplayID));
+    monitors = calloc(monitorCount, sizeof(_GLFWmonitor*));
 
     CGGetActiveDisplayList(monitorCount, displays, &monitorCount);
 
@@ -341,7 +338,7 @@ GLFWvidmode* _glfwPlatformGetVideoModes(_GLFWmonitor* monitor, int* found)
     modes = CGDisplayCopyAllDisplayModes(monitor->ns.displayID, NULL);
     count = CFArrayGetCount(modes);
 
-    result = (GLFWvidmode*) malloc(sizeof(GLFWvidmode) * count);
+    result = calloc(count, sizeof(GLFWvidmode));
     *found = 0;
 
     for (i = 0;  i < count;  i++)
