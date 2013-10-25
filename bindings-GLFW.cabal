@@ -10,20 +10,20 @@ license-file: LICENSE
 
 synopsis:     Low-level bindings to GLFW OpenGL library
 description:
-  Low-level bindings to <http://www.glfw.org/ GLFW>, an open source,
+  Low-level bindings to GLFW (<http://www.glfw.org/>), an open source,
   multi-platform library for creating windows with OpenGL contexts and managing
   input and events.
   .
-  The binding is to
-  <http://www.glfw.org/Version-3.0.3-released.html GLFW 3.0.3, released 2013-09-24>.
-  http://www.glfw.org/changelog.html
+  The binding is to GLFW 3.0.3, released 2013-09-24
+  (<http://www.glfw.org/Version-3.0.3-released.html>
+  <http://www.glfw.org/changelog.html>).
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
-  see <http://hackage.haskell.org/package/GLFW-b GLFW-b>.
+  see GLFW-b (<http://hackage.haskell.org/package/GLFW-b>).
   .
   If you've used GLFW before, you were probably using 2.7.x. There are some
-  significant differences in 3.0.x. Please see the
-  <http://www.glfw.org/docs/3.0/moving.html transition guide>.
+  significant differences in 3.0.x. Please see the transition guide
+  (<http://www.glfw.org/docs/3.0/moving.html>).
 
 cabal-version: >= 1.10
 build-type:    Simple
