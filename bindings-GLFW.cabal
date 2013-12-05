@@ -162,9 +162,9 @@ test-suite main
   frameworks: AGL Cocoa OpenGL IOKit CoreFoundation CoreVideo
 
   build-depends:
+    bindings-GLFW,
     HUnit                == 1.2.*,
     base                  < 5,
-    bindings-GLFW        == 3.0.3,
     test-framework       == 0.8.*,
     test-framework-hunit == 0.3.*
 
