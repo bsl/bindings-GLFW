@@ -31,6 +31,9 @@
 #include <limits.h>
 
 #include <IOKit/graphics/IOGraphicsLib.h>
+#if _WIN64
+#define strdup _strdup
+#endif
 
 
 // Get the name of the specified display

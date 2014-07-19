@@ -29,6 +29,9 @@
 #include <limits.h>
 #include <string.h>
 
+#if _WIN64
+#define strdup _strdup
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////

@@ -31,6 +31,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if _WIN64
+#define strdup _strdup
+#endif
 
 // Returns whether the event is a selection event
 //
