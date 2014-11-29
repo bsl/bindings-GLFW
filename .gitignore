@@ -2,6 +2,7 @@
 *.dylib
 .*.swp
 .*.swo
+.DS_Store
 cabal-dev/
 dist/
 .cabal-sandbox
