@@ -113,6 +113,9 @@ library
       Xrandr
       Xxf86vm
       pthread
+    if arch(powerpc)
+      extra-libraries:
+        gcc_s
 
   if os(darwin)
     include-dirs:
