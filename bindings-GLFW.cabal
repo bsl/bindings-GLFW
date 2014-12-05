@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.0.3.3
+version:      3.0.4.0
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -14,8 +14,8 @@ description:
   multi-platform library for creating windows with OpenGL contexts and managing
   input and events.
   .
-  The binding is to GLFW 3.0.3, released 2013-09-24
-  (<http://www.glfw.org/Version-3.0.3-released.html>
+  The binding is to GLFW 3.0.4, released 2013-09-24
+  (<http://www.glfw.org/Version-3.0.4-released.html>
   <http://www.glfw.org/changelog.html>).
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
@@ -36,9 +36,6 @@ extra-source-files:
   glfw/deps/EGL/*.h
   glfw/deps/GL/*.h
 
-  glfw/include/os/unix-like/*.h
-  glfw/include/os/windows/*.h
-  glfw/include/os/darwin/*.h
   glfw/include/GLFW/*.h
 
   glfw/src/*.c
@@ -92,6 +89,8 @@ library
     glfw/src/monitor.c
     glfw/src/time.c
     glfw/src/window.c
+
+  cc-options: -D_GLFW_USE_CONFIG_H
 
   if os(linux) || os(freebsd)
     include-dirs:
