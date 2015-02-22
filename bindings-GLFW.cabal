@@ -58,7 +58,7 @@ flag MacOSXUseMenubar
 
 flag MacOSXUseRetina
   description:
-    Mac OS X only. Determines whether windows use the full resolution of 
+    Mac OS X only. Determines whether windows use the full resolution of
     Retina displays (recommended).
   default: True
 
@@ -83,6 +83,7 @@ library
 
   include-dirs:
     glfw/include/GLFW
+    glfw/include/
     glfw/src
 
   c-sources:
@@ -140,7 +141,6 @@ library
     include-dirs:
       glfw/include/os/windows
     c-sources:
-      glfw/src/win32_gamma.c
       glfw/src/win32_init.c
       glfw/src/winmm_joystick.c
       glfw/src/win32_monitor.c
