@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1
+version:      3.1.1
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -37,6 +37,9 @@ extra-source-files:
   glfw/deps/GL/*.h
 
   glfw/include/GLFW/*.h
+  glfw/include/os/unix-like/*.h
+  glfw/include/os/windows/*.h
+  glfw/include/os/darwin/*.h
 
   glfw/src/*.c
   glfw/src/*.h
@@ -67,7 +70,7 @@ flag MacOSXUseRetina
 library
   default-language: Haskell2010
 
-  ghc-options: -Wall -O2
+  ghc-options: -Wall
   if impl(ghc >= 6.8)
     ghc-options: -fwarn-tabs
 
@@ -99,10 +102,8 @@ library
     include-dirs:
       glfw/include/os/unix-like
     c-sources:
-      glfw/src/x11_gamma.c
       glfw/src/x11_init.c
       glfw/src/x11_monitor.c
-      glfw/src/x11_unicode.c
       glfw/src/x11_window.c
       glfw/src/glx_context.c
       glfw/src/linux_joystick.c
@@ -114,9 +115,6 @@ library
       Xrandr
       Xxf86vm
       pthread
-    if arch(powerpc)
-      extra-libraries:
-        gcc_s
 
   if os(darwin)
     include-dirs:
