@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.0 - www.glfw.org
+// GLFW 3.1 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2010 Camilla Berglund <elmindreda@elmindreda.org>
 //
@@ -40,6 +40,10 @@
 /* #undef _GLFW_WIN32 */
 // Define this to 1 if building GLFW for Cocoa
 #define _GLFW_COCOA
+// Define this to 1 if building GLFW for Wayland
+/* #undef _GLFW_WAYLAND */
+// Define this to 1 if building GLFW for Mir
+/* #undef _GLFW_MIR */
 
 // Define this to 1 if building GLFW for EGL
 /* #undef _GLFW_EGL */
@@ -53,8 +57,6 @@
 // Define this to 1 if building as a shared library / dynamic library / DLL
 /* #undef _GLFW_BUILD_DLL */
 
-// Define this to 1 to disable dynamic loading of winmm
-/* #undef _GLFW_NO_DLOAD_WINMM */
 // Define this to 1 if glfwSwapInterval should ignore DWM compositing status
 /* #undef _GLFW_USE_DWM_SWAP_INTERVAL */
 // Define this to 1 to force use of high-performance GPU on Optimus systems
@@ -73,6 +75,8 @@
 #define _GLFW_USE_CHDIR
 // Define this to 1 if glfwCreateWindow should populate the menu bar
 #define _GLFW_USE_MENUBAR
+// Define this to 1 if windows should use full resolution on Retina displays
+#define _GLFW_USE_RETINA
 
 // Define this to 1 if using OpenGL as the client library
 #define _GLFW_USE_OPENGL
@@ -80,5 +84,4 @@
 /* #undef _GLFW_USE_GLESV1 */
 // Define this to 1 if using OpenGL ES 2.0 as the client library
 /* #undef _GLFW_USE_GLESV2 */
-
 
