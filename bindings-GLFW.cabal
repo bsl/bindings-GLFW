@@ -99,10 +99,8 @@ library
     include-dirs:
       glfw/include/os/unix-like
     c-sources:
-      glfw/src/x11_gamma.c
       glfw/src/x11_init.c
       glfw/src/x11_monitor.c
-      glfw/src/x11_unicode.c
       glfw/src/x11_window.c
       glfw/src/glx_context.c
       glfw/src/linux_joystick.c
