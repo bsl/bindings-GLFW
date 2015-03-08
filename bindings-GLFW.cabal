@@ -113,6 +113,8 @@ library
       Xi
       Xrandr
       Xxf86vm
+      Xcursor
+      Xinerama
       pthread
     if arch(powerpc)
       extra-libraries:
