@@ -114,6 +114,8 @@ library
       Xi
       Xrandr
       Xxf86vm
+      Xcursor
+      Xinerama
       pthread
 
   if os(darwin)
