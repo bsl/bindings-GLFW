@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1.1.0
+version:      3.1.1.1
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -105,9 +105,11 @@ library
       glfw/src/x11_init.c
       glfw/src/x11_monitor.c
       glfw/src/x11_window.c
+      glfw/src/xkb_unicode.c
       glfw/src/glx_context.c
       glfw/src/linux_joystick.c
       glfw/src/posix_time.c
+      glfw/src/posix_tls.c
     extra-libraries:
       GL
       X11
