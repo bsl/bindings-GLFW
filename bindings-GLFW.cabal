@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1.1.1
+version:      3.1.1.2
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -65,6 +65,21 @@ flag MacOSXUseRetina
     Retina displays (recommended).
   default: True
 
+flag X
+  description:
+    Linux only. Determines whether to target the X11 display server.
+  default: True
+
+flag Wayland
+  description:
+    Linux only. Determines whether to target the Wayland display server.
+  default: False
+
+flag Mir
+  description:
+    Linux only. Determines whether to target the Mir display server.
+  default: False
+
 --------------------------------------------------------------------------------
 
 library
@@ -91,6 +106,7 @@ library
 
   c-sources:
     glfw/src/context.c
+    --glfw/src/egl_context.c
     glfw/src/init.c
     glfw/src/input.c
     glfw/src/monitor.c
@@ -102,14 +118,27 @@ library
     include-dirs:
       glfw/include/os/unix-like
     c-sources:
-      glfw/src/x11_init.c
-      glfw/src/x11_monitor.c
-      glfw/src/x11_window.c
       glfw/src/xkb_unicode.c
       glfw/src/glx_context.c
       glfw/src/linux_joystick.c
       glfw/src/posix_time.c
       glfw/src/posix_tls.c
+    if flag(X)
+      c-sources:
+        glfw/src/x11_init.c
+        glfw/src/x11_monitor.c
+        glfw/src/x11_window.c
+    if flag(Wayland)
+      c-sources:
+        glfw/src/wl_init.c
+        glfw/src/wl_monitor.c
+        glfw/src/wl_window.c
+    if flag(Mir)
+      c-sources:
+        glfw/src/mir_init.c
+        glfw/src/mir_monitor.c
+        glfw/src/mir_window.c
+
     extra-libraries:
       GL
       X11
