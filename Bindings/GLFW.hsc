@@ -282,6 +282,7 @@ deriving instance Data     C'GLFWwindow
 #callback GLFWscrollfun          , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
 #callback GLFWkeyfun             , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #callback GLFWcharfun            , Ptr <GLFWwindow> -> CUInt ->                        IO ()
+#callback GLFWdropfun            , Ptr <GLFWwindow> -> CInt -> Ptr (Ptr CChar) ->      IO ()
 #callback GLFWmonitorfun         , Ptr <GLFWmonitor> -> CInt ->                        IO ()
 
 #starttype GLFWvidmode
@@ -310,7 +311,7 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwGetMonitorPos              , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt ->                          IO ()
 #ccall glfwGetMonitorPhysicalSize     , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt ->                          IO ()
 #ccall glfwGetMonitorName             , Ptr <GLFWmonitor> ->                                                  IO (Ptr CChar)
-#ccall glfwSetMonitorCallback         , <GLFWmonitorfun> ->                                                   IO <GLFWmonitorfun>
+#ccall glfwSetMonitorCallback         , <GLFWmonitorfun>  ->                                                  IO <GLFWmonitorfun>
 #ccall glfwGetVideoModes              , Ptr <GLFWmonitor> -> Ptr CInt ->                                      IO (Ptr <GLFWvidmode>)
 #ccall glfwGetVideoMode               , Ptr <GLFWmonitor> ->                                                  IO (Ptr <GLFWvidmode>)
 #ccall glfwSetGamma                   , Ptr <GLFWmonitor> -> CFloat ->                                        IO ()
@@ -371,3 +372,4 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSwapInterval               , CInt ->                                                               IO ()
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
+#ccall glfwSetDropCallback            , Ptr <GLFWwindow> -> <GLFWdropfun> ->                                  IO <GLFWdropfun>
