@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1.1.3
+version:      3.1.2.0
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -80,6 +80,12 @@ flag Mir
     Linux only. Determines whether to target the Mir display server.
   default: False
 
+flag ExposeNative
+  description:
+    Whether or not to use the native access functions. You most likely do not
+    want to do this. You may if you're coding for the Rift, perhaps.
+  default: False
+
 --------------------------------------------------------------------------------
 
 library
@@ -97,7 +103,8 @@ library
 
   build-depends:
     base          < 5,
-    bindings-DSL == 1.0.*
+    bindings-DSL == 1.0.*,
+    template-haskell >= 2.10 && < 2.11
 
   include-dirs:
     glfw/include/GLFW
@@ -183,6 +190,11 @@ library
     extra-libraries:
       opengl32
       Gdi32
+
+  if flag(ExposeNative)
+    cc-options: -DExposeNative
+    exposed-modules:
+        Bindings.Helpers
 
 --------------------------------------------------------------------------------
 
