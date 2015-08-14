@@ -345,6 +345,7 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSetFramebufferSizeCallback , Ptr <GLFWwindow> -> <GLFWframebuffersizefun> ->                       IO <GLFWframebuffersizefun>
 #ccall glfwPollEvents                 ,                                                                       IO ()
 #ccall glfwWaitEvents                 ,                                                                       IO ()
+#ccall glfwPostEmptyEvent             ,                                                                       IO ()
 #ccall glfwGetInputMode               , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwSetInputMode               , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetKey                     , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
