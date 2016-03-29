@@ -1,11 +1,34 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE NoImplicitPrelude  #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 --------------------------------------------------------------------------------
 
 #include <bindings.dsl.h>
 #include <GLFW/glfw3.h>
+#ifdef ExposeNative
+
+  #if defined(_WIN32)
+
+    #define GLFW_EXPOSE_NATIVE_WIN32
+    #define GLFW_EXPOSE_NATIVE_WGL
+
+  #elif defined(__APPLE__)
+
+    #define GLFW_EXPOSE_NATIVE_COCOA
+    #define GLFW_EXPOSE_NATIVE_NSGL
+
+  #elif defined(__linux__)
+
+    #define GLFW_EXPOSE_NATIVE_X11
+    #define GLFW_EXPOSE_NATIVE_GLX
+
+  #endif
+
+  #include <GLFW/glfw3native.h>
+
+#endif
 
 --------------------------------------------------------------------------------
 
@@ -20,6 +43,12 @@ import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
 import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
+
+#ifdef ExposeNative
+import Bindings.Helpers
+
+$(warn "You are compiling glfw using the native access functions. BEWARE.")
+#endif
 
 --------------------------------------------------------------------------------
 
@@ -310,7 +339,7 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwGetMonitorPos              , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt ->                          IO ()
 #ccall glfwGetMonitorPhysicalSize     , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt ->                          IO ()
 #ccall glfwGetMonitorName             , Ptr <GLFWmonitor> ->                                                  IO (Ptr CChar)
-#ccall glfwSetMonitorCallback         , <GLFWmonitorfun> ->                                                   IO <GLFWmonitorfun>
+#ccall glfwSetMonitorCallback         , <GLFWmonitorfun>  ->                                                  IO <GLFWmonitorfun>
 #ccall glfwGetVideoModes              , Ptr <GLFWmonitor> -> Ptr CInt ->                                      IO (Ptr <GLFWvidmode>)
 #ccall glfwGetVideoMode               , Ptr <GLFWmonitor> ->                                                  IO (Ptr <GLFWvidmode>)
 #ccall glfwSetGamma                   , Ptr <GLFWmonitor> -> CFloat ->                                        IO ()
@@ -372,3 +401,32 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSwapInterval               , CInt ->                                                               IO ()
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
+
+--------------------------------------------------------------------------------
+-- GLFW 3.1 additions
+--------------------------------------------------------------------------------
+
+#num GLFW_ARROW_CURSOR
+#num GLFW_IBEAM_CURSOR
+#num GLFW_CROSSHAIR_CURSOR
+#num GLFW_HAND_CURSOR
+#num GLFW_HRESIZE_CURSOR
+#num GLFW_VRESIZE_CURSOR
+
+#starttype GLFWimage
+#field width  , CInt
+#field height , CInt
+#field pixels , Ptr CUChar
+#stoptype
+
+#opaque_t GLFWcursor
+deriving instance Typeable C'GLFWcursor
+deriving instance Data     C'GLFWcursor
+
+#callback GLFWdropfun , Ptr <GLFWwindow> -> CInt -> Ptr (Ptr CChar) -> IO ()
+
+#ccall glfwCreateCursor , Ptr <GLFWimage> -> CInt -> CInt -> IO (Ptr <GLFWcursor>)
+#ccall glfwCreateStandardCursor , CInt -> IO (Ptr <GLFWcursor>)
+#ccall glfwSetCursor , Ptr <GLFWwindow> -> Ptr <GLFWcursor> -> IO ()
+#ccall glfwDestroyCursor , Ptr <GLFWcursor> -> IO ()
+#ccall glfwSetDropCallback , Ptr <GLFWwindow> -> <GLFWdropfun> -> IO <GLFWdropfun>
