@@ -284,6 +284,7 @@ deriving instance Data     C'GLFWwindow
 #callback GLFWkeyfun             , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #callback GLFWcharfun            , Ptr <GLFWwindow> -> CUInt ->                        IO ()
 #callback GLFWmonitorfun         , Ptr <GLFWmonitor> -> CInt ->                        IO ()
+#callback GLFWdropfun            , Ptr <GLFWwindow> -> CInt -> Ptr CString ->          IO ()
 
 #starttype GLFWvidmode
 #field width       , CInt
@@ -373,3 +374,4 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSwapInterval               , CInt ->                                                               IO ()
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
+#ccall glfwSetDropCallback            , Ptr <GLFWwindow> -> <GLFWdropfun> ->                                  IO <GLFWdropfun>
