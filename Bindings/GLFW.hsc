@@ -17,6 +17,7 @@ import Prelude (($), return)
 import Data.Data        (Data)
 import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
+import Foreign.C.String (CString)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
 import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
@@ -268,7 +269,7 @@ deriving instance Data     C'GLFWmonitor
 deriving instance Typeable C'GLFWwindow
 deriving instance Data     C'GLFWwindow
 
-#callback GLFWerrorfun           , CInt -> Ptr CChar ->                                IO ()
+#callback GLFWerrorfun           , CInt -> CString ->                                  IO ()
 #callback GLFWwindowposfun       , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
 #callback GLFWwindowsizefun      , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
 #callback GLFWwindowclosefun     , Ptr <GLFWwindow> ->                                 IO ()
@@ -283,6 +284,7 @@ deriving instance Data     C'GLFWwindow
 #callback GLFWkeyfun             , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #callback GLFWcharfun            , Ptr <GLFWwindow> -> CUInt ->                        IO ()
 #callback GLFWmonitorfun         , Ptr <GLFWmonitor> -> CInt ->                        IO ()
+#callback GLFWdropfun            , Ptr <GLFWwindow> -> CInt -> Ptr CString ->          IO ()
 
 #starttype GLFWvidmode
 #field width       , CInt
@@ -372,3 +374,4 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSwapInterval               , CInt ->                                                               IO ()
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
+#ccall glfwSetDropCallback            , Ptr <GLFWwindow> -> <GLFWdropfun> ->                                  IO <GLFWdropfun>
