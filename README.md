@@ -1,3 +1,7 @@
+bindings-GLFW
+=============
+[![Hackage](https://img.shields.io/hackage/v/bindings-GLFW.svg)](http://hackage.haskell.org/package/bindings-GLFW)
+
 Low-level [Haskell][1] bindings to [GLFW][2], an open source, multi-platform
 library for creating windows with OpenGL contexts and managing input and
 events.
