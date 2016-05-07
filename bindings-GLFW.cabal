@@ -104,7 +104,7 @@ library
   build-depends:
     base          < 5,
     bindings-DSL == 1.0.*,
-    template-haskell >= 2.10 && < 2.11
+    template-haskell >= 2.10 && < 2.12
 
   include-dirs:
     glfw/include/GLFW
