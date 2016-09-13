@@ -28,6 +28,7 @@
 #include "internal.h"
 
 #include <stdlib.h>
+#include <float.h>
 #if defined(_MSC_VER)
  #include <malloc.h>
 #endif
@@ -216,10 +217,10 @@ void _glfwInputCursorEnter(_GLFWwindow* window, int entered)
         window->callbacks.cursorEnter((GLFWwindow*) window, entered);
 }
 
-void _glfwInputDrop(_GLFWwindow* window, int count, const char** names)
+void _glfwInputDrop(_GLFWwindow* window, int count, const char** paths)
 {
     if (window->callbacks.drop)
-        window->callbacks.drop((GLFWwindow*) window, count, names);
+        window->callbacks.drop((GLFWwindow*) window, count, paths);
 }
 
 
@@ -591,6 +592,13 @@ GLFWAPI double glfwGetTime(void)
 GLFWAPI void glfwSetTime(double time)
 {
     _GLFW_REQUIRE_INIT();
+
+    if (time != time || time - DBL_MAX == time || time < 0.0)
+    {
+        _glfwInputError(GLFW_INVALID_VALUE, "Invalid time");
+        return;
+    }
+
     _glfwPlatformSetTime(time);
 }
 

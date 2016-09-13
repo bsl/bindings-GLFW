@@ -62,6 +62,10 @@
 // Define this to 1 to force use of high-performance GPU on Optimus systems
 /* #undef _GLFW_USE_OPTIMUS_HPG */
 
+// Define this to 1 if the XInput X11 extension is available
+/* #undef _GLFW_HAS_XINPUT */
+// Define this to 1 if the Xxf86vm X11 extension is available
+/* #undef _GLFW_HAS_XF86VM */
 // Define this to 1 if glXGetProcAddress is available
 /* #undef _GLFW_HAS_GLXGETPROCADDRESS */
 // Define this to 1 if glXGetProcAddressARB is available
