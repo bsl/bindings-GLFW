@@ -120,6 +120,7 @@ library
     glfw/src/monitor.c
     glfw/src/window.c
     glfw/src/vulkan.c
+    glfw/src/egl_context.c
 
   cc-options: -D_GLFW_USE_CONFIG_H
 
