@@ -41,6 +41,7 @@ import Data.Data        (Data)
 import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
+import GHC.Word         (Word32, Word64)
 import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
 
@@ -395,7 +396,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetWindowPos               , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
 #ccall glfwSetWindowPos               , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetWindowSize              , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
-#ccall glfwSetWindowSizeLimits        , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt                       IO ()
+#ccall glfwSetWindowSizeLimits        , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt ->                     IO ()
 #ccall glfwSetWindowAspectRatio       , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwSetWindowSize              , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetFramebufferSize         , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
@@ -451,8 +452,8 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetClipboardString         , Ptr <GLFWwindow> ->                                                   IO (Ptr CChar)
 #ccall glfwGetTime                    ,                                                                       IO CDouble
 #ccall glfwSetTime                    , CDouble ->                                                            IO ()
-#ccall glfwGetTimerValue              ,                                                                      IO (CUInt64)
-#ccall glfwGetTimerFrequency          ,                                                                      IO (CUInt64)
+#ccall glfwGetTimerValue              ,                                                                      IO (Word64)
+#ccall glfwGetTimerFrequency          ,                                                                      IO (Word64)
 #ccall glfwMakeContextCurrent         , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwGetCurrentContext          ,                                                                       IO (Ptr <GLFWwindow>)
 #ccall glfwSwapBuffers                , Ptr <GLFWwindow> ->                                                   IO ()
@@ -460,8 +461,24 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
 #ccall glfwVulkanSupported            ,                                                                      IO CInt
-#ccall glfwGetRequiredInstanceExtensions , Ptr <CUInt32> ->                                                   IO (Ptr (Ptr CChar))
+#ccall glfwGetRequiredInstanceExtensions , Ptr Word32 ->                                                   IO (Ptr (Ptr CChar))
 
-#ccall glfwGetInstanceProcAddress     , <VkInstance> -> Ptr CChar                                             IO <GLFWvkproc>
-#ccall glfwGetPhysicalDevicePresentationSupport  , <VkInstance> -> <VkPhysicalDevice> -> CUInt32 ->             IO CInt
-#ccall glfwCreateWindowSurface        , <VkInstance> -> Ptr <GLFWwindw> -> Ptr (VkAllocationCallbacks) -> Ptr <VkSurfaceKHR> -> IO <VkResult>
+-- #opaque_t VkInstance
+-- deriving instance Typeable C'VkInstance
+-- deriving instance Data     C'VkInstance
+
+-- #opaque_t VkPhysicalDevice
+-- deriving instance Typeable C'VkPhysicalDevice
+-- deriving instance Data     C'VkPhysicalDevice
+
+-- #opaque_t VkSurfaceKHR
+-- deriving instance Typeable C'VkSurfaceKHR
+-- deriving instance Data     C'VkSurfaceKHR
+
+-- #opaque_t VkAllocationCallbacks
+-- deriving instance Typeable C'VkAllocationCallbacks
+-- deriving instance Data     C'VkAllocationCallbacks
+
+-- #ccall glfwGetInstanceProcAddress     , <VkInstance> -> Ptr CChar                                             IO <GLFWvkproc>
+-- #ccall glfwGetPhysicalDevicePresentationSupport  , <VkInstance> -> <VkPhysicalDevice> -> Word32 ->             IO CInt
+-- #ccall glfwCreateWindowSurface        , <VkInstance> -> Ptr <GLFWwindow> -> Ptr (VkAllocationCallbacks) -> Ptr <VkSurfaceKHR> -> IO <VkResult>
