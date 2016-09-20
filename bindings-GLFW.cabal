@@ -119,6 +119,7 @@ library
     glfw/src/input.c
     glfw/src/monitor.c
     glfw/src/window.c
+    glfw/src/vulkan.c
 
   cc-options: -D_GLFW_USE_CONFIG_H
 

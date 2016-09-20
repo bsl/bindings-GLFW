@@ -366,7 +366,7 @@ deriving instance Data     C'GLFWcursor
 #starttype GLFWimage
 #field width  , CInt
 #field height , CInt
-#field pixels , Ptr CChar
+#field pixels , Ptr CUChar
 #stoptype
 
 #ccall glfwInit                       ,                                                                       IO CInt
@@ -400,7 +400,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowAspectRatio       , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwSetWindowSize              , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetFramebufferSize         , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
-#ccall glfwGetFrameSize               , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
+#ccall glfwGetWindowFrameSize         , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt ->     IO ()
 #ccall glfwIconifyWindow              , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwRestoreWindow              , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwMaximizeWindow             , Ptr <GLFWwindow> ->                                                   IO ()
@@ -431,13 +431,13 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetMouseButton             , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwGetCursorPos               , Ptr <GLFWwindow> -> Ptr CDouble -> Ptr CDouble ->                     IO ()
 #ccall glfwSetCursorPos               , Ptr <GLFWwindow> -> CDouble -> CDouble ->                             IO ()
-#ccall glfwCreateCursor               , Ptr <GLFWimage> -> CInt -> CInt ->                                    IO ()
-#ccall glfwCreateStandardCursor       , CInt ->                                                              IO ()
+#ccall glfwCreateCursor               , Ptr <GLFWimage> -> CInt -> CInt ->                                    IO (Ptr <GLFWcursor>)
+#ccall glfwCreateStandardCursor       , CInt ->                                                              IO (Ptr <GLFWcursor>)
 #ccall glfwDestroyCursor              , Ptr <GLFWcursor> ->                                                  IO ()
 #ccall glfwSetCursor                  , Ptr <GLFWwindow> -> Ptr <GLFWcursor> ->                               IO ()
 #ccall glfwSetKeyCallback             , Ptr <GLFWwindow> -> <GLFWkeyfun> ->                                   IO <GLFWkeyfun>
 #ccall glfwSetCharCallback            , Ptr <GLFWwindow> -> <GLFWcharfun> ->                                  IO <GLFWcharfun>
-#ccall glfwcharmodsfun                , Ptr <GLFWwindow> -> <GLFWcharmodsfun> ->                              IO <GLFWcharmodsfun>
+#ccall glfwSetCharModsCallback        , Ptr <GLFWwindow> -> <GLFWcharmodsfun> ->                              IO <GLFWcharmodsfun>
 #ccall glfwSetMouseButtonCallback     , Ptr <GLFWwindow> -> <GLFWmousebuttonfun> ->                           IO <GLFWmousebuttonfun>
 #ccall glfwSetCursorPosCallback       , Ptr <GLFWwindow> -> <GLFWcursorposfun> ->                             IO <GLFWcursorposfun>
 #ccall glfwSetCursorEnterCallback     , Ptr <GLFWwindow> -> <GLFWcursorenterfun> ->                           IO <GLFWcursorenterfun>
