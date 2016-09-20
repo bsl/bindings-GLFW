@@ -233,12 +233,16 @@ $(warn "You are compiling glfw using the native access functions. BEWARE.")
 #num GLFW_VERSION_UNAVAILABLE
 #num GLFW_PLATFORM_ERROR
 #num GLFW_FORMAT_UNAVAILABLE
+#num GLFW_NO_WINDOW_CONTEXT
 
 #num GLFW_FOCUSED
 #num GLFW_ICONIFIED
 #num GLFW_RESIZABLE
 #num GLFW_VISIBLE
 #num GLFW_DECORATED
+#num GLFW_AUTO_ICONIFY
+#num GLFW_FLOATING
+#num GLFW_MAXIMIZED
 
 #num GLFW_RED_BITS
 #num GLFW_GREEN_BITS
@@ -255,6 +259,7 @@ $(warn "You are compiling glfw using the native access functions. BEWARE.")
 #num GLFW_SAMPLES
 #num GLFW_SRGB_CAPABLE
 #num GLFW_REFRESH_RATE
+#num GLFW_DOUBLEBUFFER
 
 #num GLFW_CLIENT_API
 #num GLFW_CONTEXT_VERSION_MAJOR
@@ -264,7 +269,11 @@ $(warn "You are compiling glfw using the native access functions. BEWARE.")
 #num GLFW_OPENGL_FORWARD_COMPAT
 #num GLFW_OPENGL_DEBUG_CONTEXT
 #num GLFW_OPENGL_PROFILE
+#num GLFW_CONTEXT_RELEASE_BEHAVIOR
+#num GLFW_CONTEXT_NO_ERROR
+#num GLFW_CONTEXT_CREATION_API
 
+#num GLFW_NO_API
 #num GLFW_OPENGL_API
 #num GLFW_OPENGL_ES_API
 
@@ -284,10 +293,27 @@ $(warn "You are compiling glfw using the native access functions. BEWARE.")
 #num GLFW_CURSOR_HIDDEN
 #num GLFW_CURSOR_DISABLED
 
+#num GLFW_ANY_RELEASE_BEHAVIOR
+#num GLFW_RELEASE_BEHAVIOR_FLUSH
+#num GLFW_RELEASE_BEHAVIOR_NONE
+
+#num GLFW_NATIVE_CONTEXT_API
+#num GLFW_EGL_CONTEXT_API
+
+#num GLFW_ARROW_CURSOR
+#num GLFW_IBEAM_CURSOR
+#num GLFW_CROSSHAIR_CURSOR
+#num GLFW_HAND_CURSOR
+#num GLFW_HRESIZE_CURSOR
+#num GLFW_VRESIZE_CURSOR
+
 #num GLFW_CONNECTED
 #num GLFW_DISCONNECTED
 
+#num GLFW_DONT_CARE
+
 #callback GLFWglproc , IO ()
+#callback GLFWvkproc , IO ()
 
 #opaque_t GLFWmonitor
 deriving instance Typeable C'GLFWmonitor
@@ -296,6 +322,10 @@ deriving instance Data     C'GLFWmonitor
 #opaque_t GLFWwindow
 deriving instance Typeable C'GLFWwindow
 deriving instance Data     C'GLFWwindow
+
+#opaque_t GLFWcursor
+deriving instance Typeable C'GLFWcursor
+deriving instance Data     C'GLFWcursor
 
 #callback GLFWerrorfun           , CInt -> Ptr CChar ->                                IO ()
 #callback GLFWwindowposfun       , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
@@ -311,7 +341,10 @@ deriving instance Data     C'GLFWwindow
 #callback GLFWscrollfun          , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
 #callback GLFWkeyfun             , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #callback GLFWcharfun            , Ptr <GLFWwindow> -> CUInt ->                        IO ()
+#callback GLFWcharmodsfun        , Ptr <GLFWwindow> -> CUInt -> CInt ->                IO ()
+#callback GLFWdropfun            , Ptr <GLFWwindow> -> CInt -> Ptr (Ptr CChar) ->      IO ()
 #callback GLFWmonitorfun         , Ptr <GLFWmonitor> -> CInt ->                        IO ()
+#callback GLFWjoystickfun        , Ptr <GLFWmonitor> -> CInt -> CInt ->                 IO ()
 
 #starttype GLFWvidmode
 #field width       , CInt
@@ -327,6 +360,12 @@ deriving instance Data     C'GLFWwindow
 #field green , Ptr CUShort
 #field blue  , Ptr CUShort
 #field size  , CUInt
+#stoptype
+
+#starttype GLFWimage
+#field width  , CInt
+#field height , CInt
+#field pixels , Ptr CChar
 #stoptype
 
 #ccall glfwInit                       ,                                                                       IO CInt
@@ -352,16 +391,23 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwWindowShouldClose          , Ptr <GLFWwindow> ->                                                   IO CInt
 #ccall glfwSetWindowShouldClose       , Ptr <GLFWwindow> -> CInt ->                                           IO ()
 #ccall glfwSetWindowTitle             , Ptr <GLFWwindow> -> Ptr CChar ->                                      IO ()
+#ccall glfwSetWindowIcon              , Ptr <GLFWwindow> -> CInt -> Ptr <GLFWimage> ->                         IO ()
 #ccall glfwGetWindowPos               , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
 #ccall glfwSetWindowPos               , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetWindowSize              , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
+#ccall glfwSetWindowSizeLimits        , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt                       IO ()
+#ccall glfwSetWindowAspectRatio       , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwSetWindowSize              , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
 #ccall glfwGetFramebufferSize         , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
+#ccall glfwGetFrameSize               , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt ->                           IO ()
 #ccall glfwIconifyWindow              , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwRestoreWindow              , Ptr <GLFWwindow> ->                                                   IO ()
+#ccall glfwMaximizeWindow             , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwShowWindow                 , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwHideWindow                 , Ptr <GLFWwindow> ->                                                   IO ()
+#ccall glfwFocusWindow                , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwGetWindowMonitor           , Ptr <GLFWwindow> ->                                                   IO (Ptr <GLFWmonitor>)
+#ccall glfwSetWindowMonitor           , Ptr <GLFWwindow> -> Ptr <GLFWmonitor> -> CInt -> CInt -> CInt -> CInt -> CInt -> IO ()
 #ccall glfwGetWindowAttrib            , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwSetWindowUserPointer       , Ptr <GLFWwindow> -> Ptr () ->                                         IO ()
 #ccall glfwGetWindowUserPointer       , Ptr <GLFWwindow> ->                                                   IO (Ptr ())
@@ -374,59 +420,48 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwSetFramebufferSizeCallback , Ptr <GLFWwindow> -> <GLFWframebuffersizefun> ->                       IO <GLFWframebuffersizefun>
 #ccall glfwPollEvents                 ,                                                                       IO ()
 #ccall glfwWaitEvents                 ,                                                                       IO ()
+#ccall glfwWaitEventsTimeout          , CDouble ->                                                             IO ()
 #ccall glfwPostEmptyEvent             ,                                                                       IO ()
 #ccall glfwGetInputMode               , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwSetInputMode               , Ptr <GLFWwindow> -> CInt -> CInt ->                                   IO ()
+#ccall glfwGetKeyName                 , CInt -> CInt ->                                           IO CInt
+#ccall glfwGetKeyScancode             , CInt ->                                           IO CInt
 #ccall glfwGetKey                     , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwGetMouseButton             , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwGetCursorPos               , Ptr <GLFWwindow> -> Ptr CDouble -> Ptr CDouble ->                     IO ()
 #ccall glfwSetCursorPos               , Ptr <GLFWwindow> -> CDouble -> CDouble ->                             IO ()
+#ccall glfwCreateCursor               , Ptr <GLFWimage> -> CInt -> CInt ->                                    IO ()
+#ccall glfwCreateStandardCursor       , CInt ->                                                              IO ()
+#ccall glfwDestroyCursor              , Ptr <GLFWcursor> ->                                                  IO ()
+#ccall glfwSetCursor                  , Ptr <GLFWwindow> -> Ptr <GLFWcursor> ->                               IO ()
 #ccall glfwSetKeyCallback             , Ptr <GLFWwindow> -> <GLFWkeyfun> ->                                   IO <GLFWkeyfun>
 #ccall glfwSetCharCallback            , Ptr <GLFWwindow> -> <GLFWcharfun> ->                                  IO <GLFWcharfun>
+#ccall glfwcharmodsfun                , Ptr <GLFWwindow> -> <GLFWcharmodsfun> ->                              IO <GLFWcharmodsfun>
 #ccall glfwSetMouseButtonCallback     , Ptr <GLFWwindow> -> <GLFWmousebuttonfun> ->                           IO <GLFWmousebuttonfun>
 #ccall glfwSetCursorPosCallback       , Ptr <GLFWwindow> -> <GLFWcursorposfun> ->                             IO <GLFWcursorposfun>
 #ccall glfwSetCursorEnterCallback     , Ptr <GLFWwindow> -> <GLFWcursorenterfun> ->                           IO <GLFWcursorenterfun>
 #ccall glfwSetScrollCallback          , Ptr <GLFWwindow> -> <GLFWscrollfun> ->                                IO <GLFWscrollfun>
+#ccall glfwSetDropCallback            , Ptr <GLFWwindow> -> <GLFWdropfun> ->                                  IO <GLFWdropfun>
 #ccall glfwJoystickPresent            , CInt ->                                                               IO CInt
 #ccall glfwGetJoystickAxes            , CInt -> Ptr CInt ->                                                   IO (Ptr CFloat)
 #ccall glfwGetJoystickButtons         , CInt -> Ptr CInt ->                                                   IO (Ptr CUChar)
 #ccall glfwGetJoystickName            , CInt ->                                                               IO (Ptr CChar)
+#ccall glfwSetJoystickCallback        , <GLFWjoystickfun> ->                                                 IO (Ptr CChar)
 #ccall glfwSetClipboardString         , Ptr <GLFWwindow> -> Ptr CChar ->                                      IO ()
 #ccall glfwGetClipboardString         , Ptr <GLFWwindow> ->                                                   IO (Ptr CChar)
 #ccall glfwGetTime                    ,                                                                       IO CDouble
 #ccall glfwSetTime                    , CDouble ->                                                            IO ()
+#ccall glfwGetTimerValue              ,                                                                      IO (CUInt64)
+#ccall glfwGetTimerFrequency          ,                                                                      IO (CUInt64)
 #ccall glfwMakeContextCurrent         , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwGetCurrentContext          ,                                                                       IO (Ptr <GLFWwindow>)
 #ccall glfwSwapBuffers                , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwSwapInterval               , CInt ->                                                               IO ()
 #ccall glfwExtensionSupported         , Ptr CChar ->                                                          IO CInt
 #ccall glfwGetProcAddress             , Ptr CChar ->                                                          IO <GLFWglproc>
+#ccall glfwVulkanSupported            ,                                                                      IO CInt
+#ccall glfwGetRequiredInstanceExtensions , Ptr <CUInt32> ->                                                   IO (Ptr (Ptr CChar))
 
---------------------------------------------------------------------------------
--- GLFW 3.1 additions
---------------------------------------------------------------------------------
-
-#num GLFW_ARROW_CURSOR
-#num GLFW_IBEAM_CURSOR
-#num GLFW_CROSSHAIR_CURSOR
-#num GLFW_HAND_CURSOR
-#num GLFW_HRESIZE_CURSOR
-#num GLFW_VRESIZE_CURSOR
-
-#starttype GLFWimage
-#field width  , CInt
-#field height , CInt
-#field pixels , Ptr CUChar
-#stoptype
-
-#opaque_t GLFWcursor
-deriving instance Typeable C'GLFWcursor
-deriving instance Data     C'GLFWcursor
-
-#callback GLFWdropfun , Ptr <GLFWwindow> -> CInt -> Ptr (Ptr CChar) -> IO ()
-
-#ccall glfwCreateCursor , Ptr <GLFWimage> -> CInt -> CInt -> IO (Ptr <GLFWcursor>)
-#ccall glfwCreateStandardCursor , CInt -> IO (Ptr <GLFWcursor>)
-#ccall glfwSetCursor , Ptr <GLFWwindow> -> Ptr <GLFWcursor> -> IO ()
-#ccall glfwDestroyCursor , Ptr <GLFWcursor> -> IO ()
-#ccall glfwSetDropCallback , Ptr <GLFWwindow> -> <GLFWdropfun> -> IO <GLFWdropfun>
+#ccall glfwGetInstanceProcAddress     , <VkInstance> -> Ptr CChar                                             IO <GLFWvkproc>
+#ccall glfwGetPhysicalDevicePresentationSupport  , <VkInstance> -> <VkPhysicalDevice> -> CUInt32 ->             IO CInt
+#ccall glfwCreateWindowSurface        , <VkInstance> -> Ptr <GLFWwindw> -> Ptr (VkAllocationCallbacks) -> Ptr <VkSurfaceKHR> -> IO <VkResult>
