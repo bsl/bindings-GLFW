@@ -14,7 +14,7 @@ The binding is to [GLFW 3.1 released 2015-01-18][3].
 *These bindings are too low-level for normal use.* For higher-level GLFW
 bindings, see [GLFW-b][4].
 
-## For devs
+## Contributing
 
 This package uses git-flow as development model, in short that means that:
 
@@ -22,8 +22,8 @@ This package uses git-flow as development model, in short that means that:
 2. "master" branch is reserved for stable releases.
 3. Patches for bugs related with previous releases should always be done in
     "hotfixes" branch.
-4. All merge commits to master from "develop" and "hotfixes" should be done
-    using the "--no-ff" flag.
+4. All merge commits to master from "hotfixes" should be done
+    using the "--no-ff" flag and from "develop" should avoid merging commits.
 
 Until we have a defined road-map we are going to leave out "release
 "branches" and "feature branches". For more information about this development
