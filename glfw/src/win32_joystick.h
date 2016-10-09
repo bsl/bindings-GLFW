@@ -1,7 +1,6 @@
 //========================================================================
-// GLFW 3.2 POSIX - www.glfw.org
+// GLFW 3.2 Win32 - www.glfw.org
 //------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
@@ -25,25 +24,41 @@
 //
 //========================================================================
 
-#ifndef _glfw3_posix_tls_h_
-#define _glfw3_posix_tls_h_
+#ifndef _glfw3_win32_joystick_h_
+#define _glfw3_win32_joystick_h_
 
-#include <pthread.h>
+#define _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE \
+    _GLFWjoystickWin32 win32_js[GLFW_JOYSTICK_LAST + 1]
 
-#define _GLFW_PLATFORM_LIBRARY_TLS_STATE _GLFWtlsPOSIX posix_tls
-
-
-// POSIX-specific global TLS data
+// Joystick element (axis, button or slider)
 //
-typedef struct _GLFWtlsPOSIX
+typedef struct _GLFWjoyobjectWin32
 {
-    GLFWbool        allocated;
-    pthread_key_t   context;
+    int                     offset;
+    int                     type;
+} _GLFWjoyobjectWin32;
 
-} _GLFWtlsPOSIX;
+// Win32-specific per-joystick data
+//
+typedef struct _GLFWjoystickWin32
+{
+    GLFWbool                present;
+    float*                  axes;
+    int                     axisCount;
+    unsigned char*          buttons;
+    int                     buttonCount;
+    _GLFWjoyobjectWin32*    objects;
+    int                     objectCount;
+    char*                   name;
+    IDirectInputDevice8W*   device;
+    DWORD                   index;
+    GUID                    guid;
+} _GLFWjoystickWin32;
 
 
-GLFWbool _glfwInitThreadLocalStoragePOSIX(void);
-void _glfwTerminateThreadLocalStoragePOSIX(void);
+void _glfwInitJoysticksWin32(void);
+void _glfwTerminateJoysticksWin32(void);
+void _glfwDetectJoystickConnectionWin32(void);
+void _glfwDetectJoystickDisconnectionWin32(void);
 
-#endif // _glfw3_posix_tls_h_
+#endif // _glfw3_win32_joystick_h_

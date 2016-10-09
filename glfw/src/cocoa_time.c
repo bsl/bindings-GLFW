@@ -1,8 +1,7 @@
 //========================================================================
-// GLFW 3.2 POSIX - www.glfw.org
+// GLFW 3.2 OS X - www.glfw.org
 //------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2016 Camilla Berglund <elmindreda@glfw.org>
+// Copyright (c) 2009-2016 Camilla Berglund <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -25,25 +24,37 @@
 //
 //========================================================================
 
-#ifndef _glfw3_posix_tls_h_
-#define _glfw3_posix_tls_h_
+#include "internal.h"
 
-#include <pthread.h>
-
-#define _GLFW_PLATFORM_LIBRARY_TLS_STATE _GLFWtlsPOSIX posix_tls
+#include <mach/mach_time.h>
 
 
-// POSIX-specific global TLS data
+//////////////////////////////////////////////////////////////////////////
+//////                       GLFW internal API                      //////
+//////////////////////////////////////////////////////////////////////////
+
+// Initialise timer
 //
-typedef struct _GLFWtlsPOSIX
+void _glfwInitTimerNS(void)
 {
-    GLFWbool        allocated;
-    pthread_key_t   context;
+    mach_timebase_info_data_t info;
+    mach_timebase_info(&info);
 
-} _GLFWtlsPOSIX;
+    _glfw.ns_time.frequency = (info.denom * 1e9) / info.numer;
+}
 
 
-GLFWbool _glfwInitThreadLocalStoragePOSIX(void);
-void _glfwTerminateThreadLocalStoragePOSIX(void);
+//////////////////////////////////////////////////////////////////////////
+//////                       GLFW platform API                      //////
+//////////////////////////////////////////////////////////////////////////
 
-#endif // _glfw3_posix_tls_h_
+uint64_t _glfwPlatformGetTimerValue(void)
+{
+    return mach_absolute_time();
+}
+
+uint64_t _glfwPlatformGetTimerFrequency(void)
+{
+    return _glfw.ns_time.frequency;
+}
+
