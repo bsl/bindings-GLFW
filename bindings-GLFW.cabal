@@ -126,25 +126,24 @@ library
     include-dirs:
       glfw/include/os/unix-like
     c-sources:
+      glfw/src/glx_context.c
+      glfw/src/egl_context.c
       glfw/src/xkb_unicode.c
       glfw/src/linux_joystick.c
       glfw/src/posix_time.c
       glfw/src/posix_tls.c
     if flag(X)
       c-sources:
-        glfw/src/glx_context.c
         glfw/src/x11_init.c
         glfw/src/x11_monitor.c
         glfw/src/x11_window.c
     if flag(Wayland)
       c-sources:
-        glfw/src/egl_context.c
         glfw/src/wl_init.c
         glfw/src/wl_monitor.c
         glfw/src/wl_window.c
     if flag(Mir)
       c-sources:
-        glfw/src/egl_context.c
         glfw/src/mir_init.c
         glfw/src/mir_monitor.c
         glfw/src/mir_window.c
