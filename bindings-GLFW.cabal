@@ -132,6 +132,7 @@ library
       glfw/src/linux_joystick.c
       glfw/src/posix_time.c
       glfw/src/posix_tls.c
+      glfw/src/vulkan.c
     if flag(X)
       c-sources:
         glfw/src/x11_init.c
