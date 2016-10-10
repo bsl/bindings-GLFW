@@ -443,3 +443,4 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowIcon , Ptr <GLFWwindow> -> CInt -> Ptr <GLFWimage> -> IO ()
 #ccall glfwWaitEventsTimeout , CDouble -> IO ()
 #ccall glfwSetWindowSizeLimits , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
+#ccall glfwSetWindowAspectRatio , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()

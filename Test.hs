@@ -126,6 +126,7 @@ tests p'mon p'win =
       , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
       , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
       , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
+      , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
       , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
       , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
@@ -396,6 +397,10 @@ test_glfwSetWindowIcon p'win = do
 test_glfwSetWindowSizeLimits :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowSizeLimits p'win = do
     c'glfwSetWindowSizeLimits p'win 640 480 1024 768
+
+test_glfwSetWindowAspectRatio :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowAspectRatio p'win = do
+    c'glfwSetWindowAspectRatio p'win c'GLFW_DONT_CARE c'GLFW_DONT_CARE
 
 -- NOTE: This test seems to fail in X11. This might be due to the asynchronous
 -- nature of focus events in X. We may be able to fix it by waiting for the focus
