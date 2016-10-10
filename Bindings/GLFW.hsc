@@ -361,6 +361,7 @@ deriving instance Data     C'GLFWwindow
 #ccall glfwRestoreWindow              , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwShowWindow                 , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwHideWindow                 , Ptr <GLFWwindow> ->                                                   IO ()
+#ccall glfwFocusWindow                , Ptr <GLFWwindow> ->                                                   IO ()
 #ccall glfwGetWindowMonitor           , Ptr <GLFWwindow> ->                                                   IO (Ptr <GLFWmonitor>)
 #ccall glfwGetWindowAttrib            , Ptr <GLFWwindow> -> CInt ->                                           IO CInt
 #ccall glfwSetWindowUserPointer       , Ptr <GLFWwindow> -> Ptr () ->                                         IO ()
