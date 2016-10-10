@@ -447,3 +447,5 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetKeyName , CInt -> CInt -> IO CString
 #ccall glfwGetTimerValue , IO (CULong)
 #ccall glfwGetTimerFrequency , IO (CULong)
+
+#ccall glfwVulkanSupported , IO CInt

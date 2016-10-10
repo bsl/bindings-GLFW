@@ -158,6 +158,13 @@ tests p'mon p'win =
     , testGroup "Clipboard"
       [ testCase "clipboard" $ test_clipboard p'win
       ]
+    , testGroup "Vulkan"
+      [ testCase "glfwVulkanSupported"                          test_glfwVulkanSupported
+      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequitedInstanceExtensions
+      , testCase "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
+      , testCase "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
+      , testCase "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
+      ]
     ]
 
 --------------------------------------------------------------------------------
@@ -578,5 +585,26 @@ test_clipboard p'win = do
           else peekCString p's'
 
 --------------------------------------------------------------------------------
+
+test_glfwVulkanSupported :: IO ()
+test_glfwVulkanSupported = do
+    r <- c'glfwVulkanSupported
+    r @?= 1
+
+test_glfwGetRequitedInstanceExtensions :: IO ()
+test_glfwGetRequitedInstanceExtensions = do
+    return ()
+
+test_glfwGetInstanceProcAddress :: IO ()
+test_glfwGetInstanceProcAddress = do
+    return ()
+
+test_glfwGetPhysicalDevicePresentationSupport :: IO ()
+test_glfwGetPhysicalDevicePresentationSupport = do
+    return ()
+
+test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
+test_glfwCreateWindowSurface _ = do
+    return ()
 
 {-# ANN module "HLint: ignore Use camelCase" #-}
