@@ -139,6 +139,7 @@ tests p'mon p'win =
       , testCase "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
       , testCase "glfwGetJoystickButtons" test_glfwGetJoystickButtons
       , testCase "glfwGetJoystickName"    test_glfwGetJoystickName
+      , testCase "glfwGetKeyName"         test_glfwGetKeyName
       ]
     , testGroup "Time"
       [ testCase "glfwGetTime" test_glfwGetTime
@@ -490,6 +491,14 @@ test_glfwGetJoystickName :: IO ()
 test_glfwGetJoystickName =
     forM_ joysticks $ \js -> do
         p'name <- c'glfwGetJoystickName js
+        when (p'name /= nullPtr) $ do
+            name <- peekCString p'name
+            assertBool "" $ not $ null name
+
+test_glfwGetKeyName :: IO ()
+test_glfwGetKeyName =
+    forM_ [c'GLFW_KEY_SLASH, c'GLFW_KEY_PERIOD] $ \k -> do
+        p'name <- c'glfwGetKeyName k 0
         when (p'name /= nullPtr) $ do
             name <- peekCString p'name
             assertBool "" $ not $ null name
