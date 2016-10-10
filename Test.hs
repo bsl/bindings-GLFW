@@ -114,24 +114,24 @@ tests p'mon p'win =
       -- , testCase "gamma ramp"                 $ test_glfwGamma_ramp p'mon
       ]
     , testGroup "Window handling"
-      [ testCase "glfwDefaultWindowHints"   test_glfwDefaultWindowHints
-      , testCase "window close flag"      $ test_window_close_flag p'win
-      , testCase "glfwSetWindowTitle"     $ test_glfwSetWindowTitle p'win
-      , testCase "window pos"             $ test_window_pos p'win
-      , testCase "window size"            $ test_window_size p'win
-      , testCase "glfwGetFramebufferSize" $ test_glfwGetFramebufferSize p'win
-      , testCase "iconification"          $ test_iconification p'win
-      -- , testCase "show/hide"              $ test_show_hide p'win
-      , testCase "glfwGetWindowMonitor"   $ test_glfwGetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowMonitor"   $ test_glfwSetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowIcon"      $ test_glfwSetWindowIcon p'win
-      , testCase "glfwSetWindowSizeLimits"$ test_glfwSetWindowSizeLimits p'win
-      , testCase "cursor pos"             $ test_cursor_pos p'win
-      , testCase "glfwGetWindowAttrib"    $ test_glfwGetWindowAttrib p'win
-      , testCase "glfwMaximizeWindow"     $ test_glfwMaximizeWindow p'win
-      , testCase "glfwPollEvents"           test_glfwPollEvents
-      , testCase "glfwWaitEvents"           test_glfwWaitEvents
-      , testCase "glfwWaitEventsTimeout"    test_glfwWaitEventsTimeout
+      [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , testCase "window close flag"          $ test_window_close_flag p'win
+      , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
+      , testCase "window pos"                 $ test_window_pos p'win
+      , testCase "window size"                $ test_window_size p'win
+      , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
+      , testCase "iconification"              $ test_iconification p'win
+      -- , testCase "show/hide"                  $ test_show_hide p'win
+      , testCase "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
+      , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
+      , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
+      , testCase "cursor pos"                 $ test_cursor_pos p'win
+      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
+      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
+      , testCase "glfwPollEvents"               test_glfwPollEvents
+      , testCase "glfwWaitEvents"               test_glfwWaitEvents
+      , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
       [ testCase "glfwJoystickPresent"    test_glfwJoystickPresent
