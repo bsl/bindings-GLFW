@@ -160,7 +160,7 @@ tests p'mon p'win =
       ]
     , testGroup "Vulkan"
       [ testCase "glfwVulkanSupported"                          test_glfwVulkanSupported
-      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequitedInstanceExtensions
+      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
       , testCase "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
       , testCase "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
       , testCase "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
@@ -591,9 +591,11 @@ test_glfwVulkanSupported = do
     r <- c'glfwVulkanSupported
     r @?= 1
 
-test_glfwGetRequitedInstanceExtensions :: IO ()
-test_glfwGetRequitedInstanceExtensions = do
-    return ()
+test_glfwGetRequiredInstanceExtensions :: IO ()
+test_glfwGetRequiredInstanceExtensions =
+    alloca $ \p'count -> do
+        _ <- c'glfwGetRequiredInstanceExtensions p'count
+        return ()
 
 test_glfwGetInstanceProcAddress :: IO ()
 test_glfwGetInstanceProcAddress = do

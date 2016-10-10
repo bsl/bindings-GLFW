@@ -450,3 +450,4 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetTimerFrequency , IO (CULong)
 
 #ccall glfwVulkanSupported , IO CInt
+#ccall glfwGetRequiredInstanceExtensions , Ptr CUInt -> IO (Ptr CString)
