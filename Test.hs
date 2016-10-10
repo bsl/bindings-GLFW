@@ -380,6 +380,9 @@ test_glfwGetWindowMonitor p'win _ = do
     p'mon <- c'glfwGetWindowMonitor p'win
     p'mon @?= nullPtr
 
+-- NOTE: This test seems to fail in X11. This might be due to the asynchronous
+-- nature of focus events in X. We may be able to fix it by waiting for the focus
+-- event before setting the cursor position.
 test_cursor_pos :: Ptr C'GLFWwindow -> IO ()
 test_cursor_pos p'win =
     alloca $ \p'w   ->
