@@ -387,7 +387,7 @@ test_glfwGetWindowMonitor p'win _ = do
     p'mon @?= nullPtr
 
 test_glfwSetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
-test_glfwSetWindowMonitor p'win p'mon = do
+test_glfwSetWindowMonitor p'win _ = do
     c'glfwSetWindowMonitor p'win nullPtr 0 0 100 100 60
 
 test_glfwSetWindowIcon :: Ptr C'GLFWwindow -> IO ()
