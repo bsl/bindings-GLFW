@@ -412,6 +412,7 @@ deriving instance Data     C'GLFWwindow
 #num GLFW_HAND_CURSOR
 #num GLFW_HRESIZE_CURSOR
 #num GLFW_VRESIZE_CURSOR
+#num GLFW_DONT_CARE
 
 #starttype GLFWimage
 #field width  , CInt
