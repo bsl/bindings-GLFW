@@ -437,3 +437,4 @@ deriving instance Data     C'GLFWcursor
 --------------------------------------------------------------------------------
 
 #ccall glfwFocusWindow , Ptr <GLFWwindow> -> IO ()
+#ccall glfwSetWindowMonitor , Ptr <GLFWwindow> -> Ptr <GLFWmonitor> -> CInt -> CInt -> CInt -> CInt -> CInt -> IO ()
