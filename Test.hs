@@ -129,6 +129,7 @@ tests p'mon p'win =
       , testCase "glfwMaximizeWindow"     $ test_glfwMaximizeWindow p'win
       , testCase "glfwPollEvents"           test_glfwPollEvents
       , testCase "glfwWaitEvents"           test_glfwWaitEvents
+      , testCase "glfwWaitEventsTimeout"    test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
       [ testCase "glfwJoystickPresent"    test_glfwJoystickPresent
@@ -431,6 +432,10 @@ test_glfwPollEvents =
 test_glfwWaitEvents :: IO ()
 test_glfwWaitEvents =
     c'glfwWaitEvents
+
+test_glfwWaitEventsTimeout :: IO ()
+test_glfwWaitEventsTimeout =
+    c'glfwWaitEventsTimeout 1.0
 
 --------------------------------------------------------------------------------
 
