@@ -126,6 +126,7 @@ tests p'mon p'win =
       , testCase "glfwSetWindowMonitor"   $ test_glfwSetWindowMonitor p'win p'mon
       , testCase "cursor pos"             $ test_cursor_pos p'win
       , testCase "glfwGetWindowAttrib"    $ test_glfwGetWindowAttrib p'win
+      , testCase "glfwMaximizeWindow"     $ test_glfwMaximizeWindow p'win
       , testCase "glfwPollEvents"           test_glfwPollEvents
       , testCase "glfwWaitEvents"           test_glfwWaitEvents
       ]
@@ -418,6 +419,10 @@ test_glfwGetWindowAttrib p'win = do
           ]
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
     rs @?= map snd pairs
+
+test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
+test_glfwMaximizeWindow p'win = do
+    c'glfwMaximizeWindow p'win
 
 test_glfwPollEvents :: IO ()
 test_glfwPollEvents =
