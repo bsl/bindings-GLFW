@@ -445,3 +445,5 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowSizeLimits , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #ccall glfwSetWindowAspectRatio , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 #ccall glfwGetKeyName , CInt -> CInt -> IO (Ptr CChar)
+#ccall glfwGetTimerValue , IO (CUInt)
+#ccall glfwGetTimerFrequency , IO (CUInt)

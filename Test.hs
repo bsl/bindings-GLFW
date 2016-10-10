@@ -145,6 +145,10 @@ tests p'mon p'win =
       [ testCase "glfwGetTime" test_glfwGetTime
       , testCase "glfwSetTime" test_glfwSetTime
       ]
+    , testGroup "Timers"
+      [ testCase "glfwGetTimerValue"         test_glfwGetTimerValue
+      , testCase "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
+      ]
     , testGroup "Context"
       [ testCase "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
       , testCase "glfwSwapBuffers"        $ test_glfwSwapBuffers p'win
@@ -516,6 +520,18 @@ test_glfwSetTime = do
     c'glfwSetTime (realToFrac t)
     t' <- realToFrac `fmap` c'glfwGetTime
     assertBool "" $ t' `between` (t, t+10)
+
+--------------------------------------------------------------------------------
+
+test_glfwGetTimerValue :: IO ()
+test_glfwGetTimerValue = do
+    val <- c'glfwGetTimerValue
+    assertBool "" $ val > 0
+
+test_glfwGetTimerFrequency :: IO ()
+test_glfwGetTimerFrequency = do
+    freq <- c'glfwGetTimerFrequency
+    assertBool "" $ freq > 0
 
 --------------------------------------------------------------------------------
 
