@@ -109,8 +109,7 @@ library
 
   build-depends:
     base          < 5,
-    bindings-DSL == 1.0.*,
-    template-haskell >= 2.10 && < 2.12
+    bindings-DSL == 1.0.*
 
   if flag(system-glfw)
     pkgconfig-depends:
@@ -202,6 +201,7 @@ library
         Gdi32
 
   if flag(ExposeNative)
+    build-depends: template-haskell >= 2.10 && < 2.12
     cc-options: -DExposeNative
     exposed-modules:
         Bindings.Helpers
