@@ -110,7 +110,7 @@ library
   build-depends:
     base          < 5,
     bindings-DSL == 1.0.*,
-    template-haskell >= 2.10 && < 2.12
+    template-haskell >= 2.10 && < 2.13
 
   if flag(system-glfw)
     pkgconfig-depends:
