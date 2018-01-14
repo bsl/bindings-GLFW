@@ -255,6 +255,7 @@ $(warn "You are compiling glfw using the native access functions. BEWARE.")
 #num GLFW_SAMPLES
 #num GLFW_SRGB_CAPABLE
 #num GLFW_REFRESH_RATE
+#num GLFW_DOUBLEBUFFER
 
 #num GLFW_CLIENT_API
 #num GLFW_CONTEXT_VERSION_MAJOR
