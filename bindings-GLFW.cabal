@@ -170,6 +170,7 @@ library
        glfw/src/cocoa_monitor.m
        glfw/src/cocoa_window.m
        glfw/src/nsgl_context.m
+       glfw/src/vulkan.c
     if !flag(MacOSXUseChdir)
       cc-options: -UGLFW_USE_CHDIR
     if !flag(MacOSXUseMenubar)
@@ -213,7 +214,7 @@ test-suite main
 
   build-depends:
     bindings-GLFW,
-    HUnit                == 1.3.*,
+    HUnit                == 1.6.*,
     base                  < 5,
     test-framework       == 0.8.*,
     test-framework-hunit == 0.3.*
