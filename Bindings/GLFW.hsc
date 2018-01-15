@@ -414,6 +414,13 @@ deriving instance Data     C'GLFWwindow
 #num GLFW_HRESIZE_CURSOR
 #num GLFW_VRESIZE_CURSOR
 #num GLFW_DONT_CARE
+#num GLFW_DOUBLEBUFFER
+#num GLFW_AUTO_ICONIFY
+#num GLFW_FLOATING
+#num GLFW_CONTEXT_RELEASE_BEHAVIOR
+#num GLFW_ANY_RELEASE_BEHAVIOR
+#num GLFW_RELEASE_BEHAVIOR_FLUSH
+#num GLFW_RELEASE_BEHAVIOR_NONE
 
 #starttype GLFWimage
 #field width  , CInt
@@ -437,6 +444,14 @@ deriving instance Data     C'GLFWcursor
 --------------------------------------------------------------------------------
 -- GLFW 3.2 additions
 --------------------------------------------------------------------------------
+
+#num GLFW_NO_API
+#num GLFW_CONTEXT_CREATION_API
+#num GLFW_NATIVE_CONTEXT_API
+#num GLFW_EGL_CONTEXT_API
+#num GLFW_CONTEXT_NO_ERROR
+#num GLFW_TRUE
+#num GLFW_FALSE
 
 #ccall glfwFocusWindow , Ptr <GLFWwindow> -> IO ()
 #ccall glfwMaximizeWindow , Ptr <GLFWwindow> -> IO ()
