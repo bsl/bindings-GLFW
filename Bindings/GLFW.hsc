@@ -8,6 +8,7 @@
 #include <bindings.dsl.h>
 #include <GLFW/glfw3.h>
 #ifdef ExposeNative
+  #warning "You are compiling glfw using the native access functions. BEWARE."
 
   #if defined(_WIN32)
 
@@ -43,13 +44,6 @@ import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
 import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
-
-#ifdef ExposeNative
-import Bindings.Helpers
-
-$(warn "You are compiling glfw using the native access functions. BEWARE.")
-#endif
-
 --------------------------------------------------------------------------------
 
 #num GL_FALSE
