@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1.2.2
+version:      3.1.2.3
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -109,8 +109,7 @@ library
 
   build-depends:
     base          < 5,
-    bindings-DSL == 1.0.*,
-    template-haskell >= 2.10 && < 2.13
+    bindings-DSL == 1.0.*
 
   if flag(system-glfw)
     pkgconfig-depends:
@@ -203,8 +202,6 @@ library
 
   if flag(ExposeNative)
     cc-options: -DExposeNative
-    exposed-modules:
-        Bindings.Helpers
 
 --------------------------------------------------------------------------------
 
