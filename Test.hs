@@ -115,6 +115,7 @@ tests p'mon p'win =
       ]
     , testGroup "Window handling"
       [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
       , testCase "window close flag"          $ test_window_close_flag p'win
       , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
       , testCase "window pos"                 $ test_window_pos p'win
@@ -128,7 +129,6 @@ tests p'mon p'win =
       , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
       , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
-      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
       , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
       , testCase "glfwPollEvents"               test_glfwPollEvents
       -- This test is commented out because it just blocks forever (which is the intended behaviour):
