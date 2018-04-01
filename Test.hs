@@ -612,6 +612,7 @@ test_clipboard p'win = do
     setGet s = do
         withCString s $ \p's ->
           c'glfwSetClipboardString p'win p's
+        threadDelay 100000  -- Give it a little time
         p's' <- c'glfwGetClipboardString p'win
         if p's' == nullPtr
           then return ""
