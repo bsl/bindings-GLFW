@@ -201,6 +201,7 @@ library
         Gdi32
 
   if flag(ExposeNative)
+    build-depends: template-haskell >= 2.10 && < 2.12
     cc-options: -DExposeNative
 
 --------------------------------------------------------------------------------
