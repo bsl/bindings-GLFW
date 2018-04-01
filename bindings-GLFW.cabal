@@ -119,6 +119,7 @@ library
     glfw/src/input.c
     glfw/src/monitor.c
     glfw/src/window.c
+    glfw/src/vulkan.c
 
   cc-options: -D_GLFW_USE_CONFIG_H
 
@@ -132,7 +133,6 @@ library
       glfw/src/linux_joystick.c
       glfw/src/posix_time.c
       glfw/src/posix_tls.c
-      glfw/src/vulkan.c
     if flag(X)
       c-sources:
         glfw/src/x11_init.c
@@ -170,7 +170,6 @@ library
        glfw/src/cocoa_monitor.m
        glfw/src/cocoa_window.m
        glfw/src/nsgl_context.m
-       glfw/src/vulkan.c
     if !flag(MacOSXUseChdir)
       cc-options: -UGLFW_USE_CHDIR
     if !flag(MacOSXUseMenubar)
@@ -183,8 +182,9 @@ library
     include-dirs:
       glfw/include/os/windows
     c-sources:
+      glfw/src/egl_context.c
       glfw/src/win32_init.c
-      glfw/src/winmm_joystick.c
+      glfw/src/win32_joystick.c
       glfw/src/win32_monitor.c
       glfw/src/win32_time.c
       glfw/src/win32_window.c
