@@ -10,7 +10,7 @@ import Foreign.Ptr           (Ptr, nullPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
-import Test.HUnit ((@?=), assertBool, assertFailure)
+import Test.HUnit ((@?=), (@?), assertBool, assertFailure)
 
 -- test-framework
 import Test.Framework (Test, defaultMain, testGroup)
@@ -363,8 +363,8 @@ test_glfwGetFramebufferSize p'win =
         h  <- peek p'h
         fw <- peek p'fw
         fh <- peek p'fh
-        fw @?= w
-        fh @?= h
+        ((fw `mod` w) == 0) @? "Framebuffer width multiple of window's"
+        ((fh `mod` h) == 0) @? "Framebuffer height multiple of window's"
 
 test_iconification :: Ptr C'GLFWwindow -> IO ()
 test_iconification p'win = do
