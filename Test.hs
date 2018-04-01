@@ -339,8 +339,8 @@ test_window_pos p'win = do
 
 test_window_size :: Ptr C'GLFWwindow -> IO ()
 test_window_size p'win = do
-    let w = 17
-        h = 37
+    let w = 177
+        h = 372
     c'glfwSetWindowSize p'win w h
     giveItTime
     alloca $ \p'w' ->
