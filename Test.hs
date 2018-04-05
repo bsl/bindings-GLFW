@@ -126,13 +126,13 @@ tests p'mon p'win =
       , testCase "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
       , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
       , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
       , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
       , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
-      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
       , testCase "glfwPollEvents"               test_glfwPollEvents
       -- This test is commented out because it just blocks forever (which is the intended behaviour):
-      --, testCase "glfwWaitEvents"               test_glfwWaitEvents
+      -- , testCase "glfwWaitEvents"               test_glfwWaitEvents
       , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
