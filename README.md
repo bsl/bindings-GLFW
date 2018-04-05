@@ -34,6 +34,5 @@ Thanks you, and happy coding.
 [1]: http://www.haskell.org/
 [2]: http://www.glfw.org/
 [3]: http://www.glfw.org/Version-3.1-released.html
-[4]: http://www.glfw.org/changelog.html
 [4]: https://github.com/bsl/GLFW-b
 [5]: http://nvie.com/posts/a-successful-git-branching-model/
