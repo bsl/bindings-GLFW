@@ -621,15 +621,18 @@ test_clipboard p'win = do
 --------------------------------------------------------------------------------
 
 test_glfwVulkanSupported :: IO ()
-test_glfwVulkanSupported = do
-    r <- c'glfwVulkanSupported
-    r @?= 1
+test_glfwVulkanSupported =
+    -- Just test that it doesn't error. If it does, then we have a problem, but
+    -- some platforms (like OS X) don't actually support vulkan.
+    c'glfwVulkanSupported >> return ()
 
 test_glfwGetRequiredInstanceExtensions :: IO ()
-test_glfwGetRequiredInstanceExtensions =
-    alloca $ \p'count -> do
-        _ <- c'glfwGetRequiredInstanceExtensions p'count
-        return ()
+test_glfwGetRequiredInstanceExtensions = do
+    support <- c'glfwVulkanSupported
+    if (support == 1)
+        then alloca $ \p'count ->
+            c'glfwGetRequiredInstanceExtensions p'count >> return ()
+        else return ()
 
 test_glfwGetInstanceProcAddress :: IO ()
 test_glfwGetInstanceProcAddress = do
