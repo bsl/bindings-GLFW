@@ -34,6 +34,10 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#if defined(_MSC_VER) || _WIN64
+#include <malloc.h>
+#define strdup _strdup
+#endif
 
 // Lexically compare video modes, used by qsort
 //

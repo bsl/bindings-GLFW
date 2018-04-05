@@ -10,7 +10,7 @@ import Foreign.Ptr           (Ptr, nullPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
-import Test.HUnit ((@?=), assertBool, assertFailure)
+import Test.HUnit ((@?=), (@?), assertBool, assertFailure)
 
 -- test-framework
 import Test.Framework (Test, defaultMain, testGroup)
@@ -115,6 +115,7 @@ tests p'mon p'win =
       ]
     , testGroup "Window handling"
       [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
       , testCase "window close flag"          $ test_window_close_flag p'win
       , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
       , testCase "window pos"                 $ test_window_pos p'win
@@ -128,7 +129,6 @@ tests p'mon p'win =
       , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
       , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
-      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
       , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
       , testCase "glfwPollEvents"               test_glfwPollEvents
       -- This test is commented out because it just blocks forever (which is the intended behaviour):
@@ -339,8 +339,8 @@ test_window_pos p'win = do
 
 test_window_size :: Ptr C'GLFWwindow -> IO ()
 test_window_size p'win = do
-    let w = 17
-        h = 37
+    let w = 177
+        h = 372
     c'glfwSetWindowSize p'win w h
     giveItTime
     alloca $ \p'w' ->
@@ -363,8 +363,8 @@ test_glfwGetFramebufferSize p'win =
         h  <- peek p'h
         fw <- peek p'fw
         fh <- peek p'fh
-        fw @?= w
-        fh @?= h
+        ((fw `mod` w) == 0) @? "Framebuffer width multiple of window's"
+        ((fh `mod` h) == 0) @? "Framebuffer height multiple of window's"
 
 test_iconification :: Ptr C'GLFWwindow -> IO ()
 test_iconification p'win = do
@@ -612,6 +612,7 @@ test_clipboard p'win = do
     setGet s = do
         withCString s $ \p's ->
           c'glfwSetClipboardString p'win p's
+        threadDelay 100000  -- Give it a little time
         p's' <- c'glfwGetClipboardString p'win
         if p's' == nullPtr
           then return ""
