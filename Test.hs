@@ -464,37 +464,6 @@ test_glfwGetWindowAttrib p'win = do
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
     rs @?= map snd pairs
 
-{- NOTE : this test seems to crash on macOSX:
-2018-01-15 13:22:30.808 main[96098:4789116] *** Assertion failure in -[_NSCGSWindow setSize:], /BuildRoot/Library/Caches/com.apple.xbs/Sources/AppKit/AppKit-1561.20.106/CGS.subproj/NSCGSWindow.m:1040
-2018-01-15 13:22:30.813 main[96098:4789116] *** Terminating app due to uncaught exception 'NSInternalInconsistencyException', reason: 'Invalid parameter not satisfying: size.width >= 0.0 && size.width < (CGFloat)INT_MAX - (CGFloat)INT_MIN && size.height >= 0.0 && size.height < (CGFloat)INT_MAX - (CGFloat)INT_MIN'
-*** First throw call stack:
-(
-	0   CoreFoundation                      0x00007fff5750100b __exceptionPreprocess + 171
-	1   libobjc.A.dylib                     0x00007fff7e0dfc76 objc_exception_throw + 48
-	2   CoreFoundation                      0x00007fff57506da2 +[NSException raise:format:arguments:] + 98
-	3   Foundation                          0x00007fff59613260 -[NSAssertionHandler handleFailureInMethod:object:file:lineNumber:description:] + 193
-	4   AppKit                              0x00007fff55530f6b -[_NSCGSWindow setSize:] + 181
-	5   AppKit                              0x00007fff55326d92 -[NSWindow _cgsPlaceWindow:] + 54
-	6   AppKit                              0x00007fff54b07be4 -[NSWindow _setFrame:updateBorderViewSize:] + 922
-	7   AppKit                              0x00007fff54b20087 -[NSWindow _oldPlaceWindow:] + 604
-	8   AppKit                              0x00007fff54b1f63a -[NSWindow _setFrameCommon:display:stashSize:] + 3108
-	9   AppKit                              0x00007fff54b1ea09 -[NSWindow _setFrame:display:allowImplicitAnimation:stashSize:] + 222
-	10  AppKit                              0x00007fff54b1e924 -[NSWindow setFrame:display:] + 67
-	11  AppKit                              0x00007fff54c98247 __28-[NSMoveHelper _doAnimation]_block_invoke + 946
-	12  AppKit                              0x00007fff54c1304c -[NSScreenDisplayLink _fire] + 298
-	13  CoreFoundation                      0x00007fff57484bb4 __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__ + 20
-	14  CoreFoundation                      0x00007fff57484827 __CFRunLoopDoTimer + 1095
-	15  CoreFoundation                      0x00007fff5748432a __CFRunLoopDoTimers + 346
-	16  CoreFoundation                      0x00007fff5747b92b __CFRunLoopRun + 2427
-	17  CoreFoundation                      0x00007fff5747ad23 CFRunLoopRunSpecific + 483
-	18  AppKit                              0x00007fff54c97484 -[NSMoveHelper _doAnimation] + 1556
-	19  AppKit                              0x00007fff54caeb3a -[NSMoveHelper _resizeWindow:toFrame:display:] + 389
-	20  AppKit                              0x00007fff54c1d752 -[NSWindow setFrame:display:animate:] + 1453
-	21  AppKit                              0x00007fff54cadc90 -[NSWindow zoom:] + 982
-	22  main                                0x0000000108e5e082 sgo3_info + 122
-)
-libc++abi.dylib: terminating with uncaught exception of type NSException
--}
 test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwMaximizeWindow p'win = do
     c'glfwMaximizeWindow p'win
