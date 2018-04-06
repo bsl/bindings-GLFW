@@ -4,6 +4,7 @@ import Control.Monad         (forM, forM_, when)
 import Data.Char             (isAscii)
 import Data.List             (intercalate, isPrefixOf)
 import Foreign.C.String      (peekCString, withCString)
+import Foreign.C.Types       (CDouble(..))
 import Foreign.Marshal.Alloc (alloca)
 import Foreign.Marshal.Array (peekArray)
 import Foreign.Ptr           (Ptr, nullPtr)
@@ -431,8 +432,19 @@ test_cursor_pos p'win =
         c'glfwGetWindowSize p'win p'w p'h
         w <- peek p'w
         h <- peek p'h
-        let cx = fromIntegral w / 2
-            cy = fromIntegral h / 2
+
+        -- Make sure we use integral coordinates here so that we don't run into
+        -- platform-dependent differences.
+        let cx :: CDouble
+            cy :: CDouble
+            (cx, cy) = (fromIntegral $ w `div` 2, fromIntegral $ h `div` 2)
+
+        -- !HACK! Poll events seems to be necessary on OS X. Otherwise, the
+        -- windowing system likely never receives the cursor update. This is
+        -- reflected in the C version of GLFW as well, we just call it here in
+        -- order to have a more robust test.
+        c'glfwPollEvents
+
         c'glfwSetCursorPos p'win cx cy
         giveItTime
         c'glfwGetCursorPos p'win p'cx' p'cy'
