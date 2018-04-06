@@ -133,8 +133,7 @@ tests p'mon p'win =
       , testCase "glfwFocusWindow"            $ test_glfwFocusWindow p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
       , testCase "glfwPollEvents"               test_glfwPollEvents
-      -- This test is commented out because it just blocks forever (which is the intended behaviour):
-      -- , testCase "glfwWaitEvents"               test_glfwWaitEvents
+      , testCase "glfwWaitEvents"               test_glfwWaitEvents
       , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
@@ -505,8 +504,7 @@ test_glfwPollEvents =
     c'glfwPollEvents
 
 test_glfwWaitEvents :: IO ()
-test_glfwWaitEvents =
-    c'glfwWaitEvents
+test_glfwWaitEvents = c'glfwPostEmptyEvent >> c'glfwWaitEvents
 
 test_glfwWaitEventsTimeout :: IO ()
 test_glfwWaitEventsTimeout =
