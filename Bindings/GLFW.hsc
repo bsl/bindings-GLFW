@@ -40,8 +40,7 @@ import Prelude (($), return)
 
 import Data.Data        (Data)
 import Data.Int         (Int32)
-import Data.Word        (Word64)
-import Data.Void        (Void)
+import Data.Word        (Word32)
 import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..), CULong(..))
@@ -462,5 +461,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetTimerFrequency , IO (CULong)
 
 #ccall glfwVulkanSupported , IO CInt
-#ccall glfwGetRequiredInstanceExtensions , Ptr CUInt -> IO (Ptr CString)
-#ccall glfwCreateWindowSurface , Ptr Void ->  Ptr <GLFWwindow> -> Ptr Void -> Ptr Word64 -> IO Int32
+#ccall glfwGetRequiredInstanceExtensions , Ptr Word32 -> IO (Ptr CString)
+#ccall glfwGetInstanceProcAddress , Ptr vkInstance -> CString -> IO (FunPtr vkProc)
+#ccall glfwGetPhysicalDevicePresentationSupport , Ptr vkInstance -> Ptr vkPhysicalDevice -> Word32 -> IO CInt
+#ccall glfwCreateWindowSurface , Ptr vkInstance ->  Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
