@@ -437,16 +437,15 @@ deriving instance Typeable C'GLFWcursor
 deriving instance Data     C'GLFWcursor
 
 #callback GLFWdropfun , Ptr <GLFWwindow> -> CInt -> Ptr (Ptr CChar) -> IO ()
+#callback GLFWcharmodsfun , Ptr <GLFWwindow> -> CUInt -> CInt -> IO ()
 
 #ccall glfwCreateCursor , Ptr <GLFWimage> -> CInt -> CInt -> IO (Ptr <GLFWcursor>)
 #ccall glfwCreateStandardCursor , CInt -> IO (Ptr <GLFWcursor>)
 #ccall glfwSetCursor , Ptr <GLFWwindow> -> Ptr <GLFWcursor> -> IO ()
 #ccall glfwDestroyCursor , Ptr <GLFWcursor> -> IO ()
 #ccall glfwSetDropCallback , Ptr <GLFWwindow> -> <GLFWdropfun> -> IO <GLFWdropfun>
-#ccall glfwGetWindowFrameSize , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
-
-#callback GLFWcharmodsfun , Ptr <GLFWwindow> -> CUInt -> CInt -> IO ()
 #ccall glfwSetCharModsCallback , Ptr <GLFWwindow> -> <GLFWcharmodsfun> -> IO <GLFWcharmodsfun>
+#ccall glfwGetWindowFrameSize , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 
 --------------------------------------------------------------------------------
 -- GLFW 3.2 additions
