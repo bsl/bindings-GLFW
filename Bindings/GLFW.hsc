@@ -6,7 +6,13 @@
 --------------------------------------------------------------------------------
 
 #include <bindings.dsl.h>
+
+#ifdef BINDINGS_GLFW_INCLUDE_VULKAN
+#  define GLFW_INCLUDE_VULKAN
+#endif // BINDINGS_GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
+
 #ifdef ExposeNative
   #warning "You are compiling glfw using the native access functions. BEWARE."
 
@@ -47,6 +53,11 @@ import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..), CULong(..
 import Foreign.C.String (CString)
 import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
+
+#ifndef BINDINGS_GLFW_INCLUDE_VULKAN
+import Foreign.Ptr      (nullFunPtr)
+import Prelude          ((++), error)
+#endif
 --------------------------------------------------------------------------------
 
 #num GLFW_VERSION_MAJOR
@@ -459,6 +470,65 @@ deriving instance Data     C'GLFWcursor
 
 #ccall glfwVulkanSupported , IO CInt
 #ccall glfwGetRequiredInstanceExtensions , Ptr Word32 -> IO (Ptr CString)
-#ccall glfwGetInstanceProcAddress , Ptr vkInstance -> CString -> IO (FunPtr vkProc)
+
+#if defined(VK_VERSION_1_0)
+-- GLFW prevents the declaration of some of the Vulkan functions in its header
+-- glfw3.h if it cannot find the required Vulkan headers. As of now (4/2018),
+-- these functions are still *defined* in vulkan.c, which is built regardless of
+-- whether or not the Vulkan headers were found. Internally, the required types
+-- are defined locally in order to make the build work, and h2c will still link
+-- against them without a problem. Whether or not you have a valid Vulkan
+-- implementation might not be clear though. Nothing is preventing the glfw3
+-- authors from hiding the Vulkan functions without valid headers, which could
+-- cause some pain in the future.
+--
+-- To mitigate this, we mimic the interface to GLFW by hiding the Vulkan
+-- functions that require valid headers. glfw3.h includes <vulkan/vulkan.h> if
+-- GLFW_INCLUDE_VULKAN is used, which users of these bindings can do if the
+-- IncludeVulkan flag is set from the cabal file along with extra-include-dirs
+-- in stack/cabal.
+
+#ccall glfwGetInstanceProcAddress               , Ptr vkInstance -> CString -> IO (FunPtr vkProc)
 #ccall glfwGetPhysicalDevicePresentationSupport , Ptr vkInstance -> Ptr vkPhysicalDevice -> Word32 -> IO CInt
-#ccall glfwCreateWindowSurface , Ptr vkInstance ->  Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
+#ccall glfwCreateWindowSurface                  , Ptr vkInstance -> Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
+
+#else
+
+p'glfwGetInstanceProcAddress :: FunPtr (Ptr vkInstance -> CString -> IO (FunPtr vkProc))
+p'glfwGetInstanceProcAddress = nullFunPtr
+
+c'glfwGetInstanceProcAddress :: Ptr vkInstance -> CString -> IO (FunPtr vkProc)
+c'glfwGetInstanceProcAddress _ _ =
+  error $ "c'glfwGetInstanceProcAddress -- undefined! "
+       ++ "Use flag 'IncludeVulkan' for package bindings-GLFW to enable."
+
+p'glfwGetPhysicalDevicePresentationSupport
+  :: FunPtr (Ptr vkInstance -> Ptr vkPhysicalDevice -> Word32 -> IO CInt)
+p'glfwGetPhysicalDevicePresentationSupport = nullFunPtr
+
+c'glfwGetPhysicalDevicePresentationSupport :: Ptr vkInstance
+                                           -> Ptr vkPhysicalDevice
+                                           -> Word32
+                                           -> IO CInt
+c'glfwGetPhysicalDevicePresentationSupport =
+  error $ "c'glfwGetPhysicalDevicePresentationSupport -- undefined! "
+       ++ "Use flag 'IncludeVulkan' for package bindings-GLFW to enable."
+
+p'glfwCreateWindowSurface :: FunPtr ( Ptr vkInstance
+                                   -> Ptr C'GLFWwindow
+                                   -> Ptr vkAllocationCallbacks
+                                   -> Ptr vkSurfaceKHR
+                                   -> IO Int32
+                                    )
+p'glfwCreateWindowSurface = nullFunPtr
+
+c'glfwCreateWindowSurface :: Ptr vkInstance
+                          -> Ptr C'GLFWwindow
+                          -> Ptr vkAllocationCallbacks
+                          -> Ptr vkSurfaceKHR
+                          -> IO Int32
+c'glfwCreateWindowSurface =
+  error $ "c'glfwCreateWindowSurface -- undefined! "
+       ++ "Use flag 'IncludeVulkan' for package bindings-GLFW to enable."
+
+#endif  // defined(VK_VERSION_1_0)
