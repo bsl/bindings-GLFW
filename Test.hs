@@ -40,7 +40,7 @@ main = do
 
     p'mon <- c'glfwGetPrimaryMonitor
 
-    c'glfwWindowHint c'GLFW_VISIBLE c'GL_FALSE
+    c'glfwWindowHint c'GLFW_VISIBLE c'GLFW_FALSE
     p'win <- withCString "bindings-GLFW test" $ \p'title ->
       c'glfwCreateWindow 100 100 p'title nullPtr nullPtr
     c'glfwMakeContextCurrent p'win
@@ -295,15 +295,15 @@ test_glfwDefaultWindowHints =
 test_window_close_flag :: Ptr C'GLFWwindow -> IO ()
 test_window_close_flag p'win = do
     r0 <- c'glfwWindowShouldClose p'win
-    r0 @?= c'GL_FALSE
+    r0 @?= c'GLFW_FALSE
 
-    c'glfwSetWindowShouldClose p'win c'GL_TRUE
+    c'glfwSetWindowShouldClose p'win c'GLFW_TRUE
     r1 <- c'glfwWindowShouldClose p'win
-    r1 @?= c'GL_TRUE
+    r1 @?= c'GLFW_TRUE
 
-    c'glfwSetWindowShouldClose p'win c'GL_FALSE
+    c'glfwSetWindowShouldClose p'win c'GLFW_FALSE
     r2 <- c'glfwWindowShouldClose p'win
-    r2 @?= c'GL_FALSE
+    r2 @?= c'GLFW_FALSE
 
 test_glfwSetWindowTitle :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowTitle p'win =
@@ -370,30 +370,30 @@ test_glfwGetFramebufferSize p'win =
 test_iconification :: Ptr C'GLFWwindow -> IO ()
 test_iconification p'win = do
     r0 <- c'glfwGetWindowAttrib p'win c'GLFW_ICONIFIED
-    r0 @?= c'GL_FALSE
+    r0 @?= c'GLFW_FALSE
 
     c'glfwIconifyWindow p'win
     giveItTime
 
     r1 <- c'glfwGetWindowAttrib p'win c'GLFW_ICONIFIED
-    r1 @?= c'GL_TRUE
+    r1 @?= c'GLFW_TRUE
 
     c'glfwRestoreWindow p'win
 
 -- test_show_hide :: Ptr C'GLFWwindow -> IO ()
 -- test_show_hide p'win = do
 --     v0 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v0 @?= c'GL_FALSE
+--     v0 @?= c'GLFW_FALSE
 
 --     c'glfwShowWindow p'win
 --     giveItTime
 --     v1 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v1 @?= c'GL_TRUE
+--     v1 @?= c'GLFW_TRUE
 
 --     c'glfwHideWindow p'win
 --     giveItTime
 --     v2 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v2 @?= c'GL_FALSE
+--     v2 @?= c'GLFW_FALSE
 
 test_glfwGetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
 test_glfwGetWindowMonitor p'win _ = do
@@ -455,10 +455,10 @@ test_cursor_pos p'win =
 test_glfwGetWindowAttrib :: Ptr C'GLFWwindow -> IO ()
 test_glfwGetWindowAttrib p'win = do
     let pairs =
-          [ ( c'GLFW_FOCUSED,    c'GL_FALSE        )
-          , ( c'GLFW_ICONIFIED,  c'GL_FALSE        )
-          , ( c'GLFW_RESIZABLE,  c'GL_TRUE         )
-          , ( c'GLFW_DECORATED,  c'GL_TRUE         )
+          [ ( c'GLFW_FOCUSED,    c'GLFW_FALSE        )
+          , ( c'GLFW_ICONIFIED,  c'GLFW_FALSE        )
+          , ( c'GLFW_RESIZABLE,  c'GLFW_TRUE         )
+          , ( c'GLFW_DECORATED,  c'GLFW_TRUE         )
           , ( c'GLFW_CLIENT_API, c'GLFW_OPENGL_API )
           ]
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
@@ -486,7 +486,7 @@ test_glfwJoystickPresent :: IO ()
 test_glfwJoystickPresent = do
     _ <- c'glfwJoystickPresent c'GLFW_JOYSTICK_1
     r <- c'glfwJoystickPresent c'GLFW_JOYSTICK_16
-    r @?= c'GL_FALSE
+    r @?= c'GLFW_FALSE
 
 test_glfwGetJoystickAxes :: IO ()
 test_glfwGetJoystickAxes =
@@ -574,8 +574,8 @@ test_glfwSwapInterval =
 test_glfwExtensionSupported :: IO ()
 test_glfwExtensionSupported = do
     let pairs =
-          [ ( "GL_ARB_multisample", c'GL_TRUE  )
-          , ( "bogus",              c'GL_FALSE )
+          [ ( "GL_ARB_multisample", c'GLFW_TRUE  )
+          , ( "bogus",              c'GLFW_FALSE )
           ]
     rs <- forM (map fst pairs) $ \ext ->
       withCString ext c'glfwExtensionSupported

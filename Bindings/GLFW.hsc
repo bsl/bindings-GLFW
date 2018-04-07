@@ -49,9 +49,6 @@ import Foreign.Ptr      (FunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
 --------------------------------------------------------------------------------
 
-#num GL_FALSE
-#num GL_TRUE
-
 #num GLFW_VERSION_MAJOR
 #num GLFW_VERSION_MINOR
 #num GLFW_VERSION_REVISION
