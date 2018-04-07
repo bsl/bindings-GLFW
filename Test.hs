@@ -50,6 +50,11 @@ main = do
       c'glfwCreateWindow 100 100 p'title nullPtr nullPtr
     c'glfwMakeContextCurrent p'win
 
+    -- Mostly check for compiling
+    cmcb <- mk'GLFWcharmodsfun $ \win x y ->
+        putStrLn $ "Got char mods callback! " ++ show (win, x, y)
+    _ <- c'glfwSetCharModsCallback p'win cmcb
+
     defaultMain $ tests p'mon p'win
 
     -- TODO because of how defaultMain works, this code is not reached
