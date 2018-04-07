@@ -445,6 +445,9 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetDropCallback , Ptr <GLFWwindow> -> <GLFWdropfun> -> IO <GLFWdropfun>
 #ccall glfwGetWindowFrameSize , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 
+#callback GLFWcharmodsfun , Ptr <GLFWwindow> -> CUInt -> CInt -> IO ()
+#ccall glfwSetCharModsCallback , Ptr <GLFWwindow> -> <GLFWcharmodsfun> -> IO <GLFWcharmodsfun>
+
 --------------------------------------------------------------------------------
 -- GLFW 3.2 additions
 --------------------------------------------------------------------------------
