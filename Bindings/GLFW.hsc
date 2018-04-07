@@ -468,6 +468,9 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetTimerValue , IO (CULong)
 #ccall glfwGetTimerFrequency , IO (CULong)
 
+#callback GLFWjoystickfun , CInt -> CInt -> IO ()
+#ccall glfwSetJoystickCallback , <GLFWjoystickfun> -> IO <GLFWjoystickfun>
+
 #ccall glfwVulkanSupported , IO CInt
 #ccall glfwGetRequiredInstanceExtensions , Ptr Word32 -> IO (Ptr CString)
 

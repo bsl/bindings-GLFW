@@ -34,6 +34,11 @@ main = do
         putStrLn $ unwords ["###", "error:", show errnum, show desc]
     _ <- c'glfwSetErrorCallback cb
 
+    -- Mostly check for compiling.
+    jcb <- mk'GLFWjoystickfun $ \x y ->
+        putStrLn $ "Got joystick callback! " ++ show (x, y)
+    _ <- c'glfwSetJoystickCallback jcb
+
     -- uncomment next line to test error callback
     -- _ <- c'glfwGetPrimaryMonitor
 
