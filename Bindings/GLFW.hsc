@@ -456,6 +456,7 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_CONTEXT_NO_ERROR
 #num GLFW_TRUE
 #num GLFW_FALSE
+#num GLFW_MAXIMIZED
 
 #ccall glfwFocusWindow , Ptr <GLFWwindow> -> IO ()
 #ccall glfwMaximizeWindow , Ptr <GLFWwindow> -> IO ()

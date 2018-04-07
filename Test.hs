@@ -471,7 +471,13 @@ test_glfwGetWindowAttrib p'win = do
 
 test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwMaximizeWindow p'win = do
+    startsMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
+    startsMaximized @?= c'GLFW_FALSE
+
     c'glfwMaximizeWindow p'win
+
+    isMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
+    isMaximized @?= c'GLFW_TRUE
 
 test_glfwPollEvents :: IO ()
 test_glfwPollEvents =
