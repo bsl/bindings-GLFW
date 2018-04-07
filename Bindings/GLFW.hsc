@@ -443,7 +443,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetCursor , Ptr <GLFWwindow> -> Ptr <GLFWcursor> -> IO ()
 #ccall glfwDestroyCursor , Ptr <GLFWcursor> -> IO ()
 #ccall glfwSetDropCallback , Ptr <GLFWwindow> -> <GLFWdropfun> -> IO <GLFWdropfun>
-
+#ccall glfwGetWindowFrameSize , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 
 --------------------------------------------------------------------------------
 -- GLFW 3.2 additions

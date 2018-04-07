@@ -127,6 +127,7 @@ tests p'mon p'win =
       , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
       , testCase "window pos"                 $ test_window_pos p'win
       , testCase "window size"                $ test_window_size p'win
+      , testCase "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
       , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
       , testCase "iconification"              $ test_iconification p'win
       -- , testCase "show/hide"                  $ test_show_hide p'win
@@ -357,6 +358,15 @@ test_window_size p'win = do
           h' <- fromIntegral `fmap` peek p'h'
           w' @?= w
           h' @?= h
+
+-- Really all we can say here is that we likely have a title bar, so just check
+-- that the 'frame' around the top edge is > 0.
+test_glfwGetWindowFrameSize :: Ptr C'GLFWwindow -> IO ()
+test_glfwGetWindowFrameSize p'win =
+    alloca $ \p'win_frame_top -> do
+        c'glfwGetWindowFrameSize p'win nullPtr p'win_frame_top nullPtr nullPtr
+        top <- peek p'win_frame_top
+        assertBool "Window has no frame width up top!" $ top > 0
 
 test_glfwGetFramebufferSize :: Ptr C'GLFWwindow -> IO ()
 test_glfwGetFramebufferSize p'win =
