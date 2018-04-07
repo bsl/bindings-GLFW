@@ -141,16 +141,19 @@ library
         glfw/src/posix_time.c
         glfw/src/posix_tls.c
       if flag(X)
+        cc-options: -DBINDINGS_GLFW_USE_X11
         c-sources:
           glfw/src/x11_init.c
           glfw/src/x11_monitor.c
           glfw/src/x11_window.c
       if flag(Wayland)
+        cc-options: -DBINDINGS_GLFW_USE_WAYLAND
         c-sources:
           glfw/src/wl_init.c
           glfw/src/wl_monitor.c
           glfw/src/wl_window.c
       if flag(Mir)
+        cc-options: -DBINDINGS_GLFW_USE_MIR
         c-sources:
           glfw/src/mir_init.c
           glfw/src/mir_monitor.c
