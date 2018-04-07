@@ -92,13 +92,6 @@ flag ExposeNative
     want to do this. You may if you're coding for the Rift, perhaps.
   default: False
 
-flag IncludeVulkan
-  description:
-    Whether or not to include the vulkan header in the GLFW bindings file. This
-    would include vulkan/vulkan.h in GLFW.hsc and should be findable in GCC's
-    includes when building the C library. (Might need extra-include-dirs)
-  default: False
-
 --------------------------------------------------------------------------------
 
 library
@@ -210,12 +203,6 @@ library
 
   if flag(ExposeNative)
     cc-options: -DExposeNative
-
-  -- Note, we can't simply -DGLFW_INCLUDE_VULKAN, because that causes duplicate
-  -- type definitions, since GLFW reimplements these types internally.
-  if flag(IncludeVulkan)
-    cc-options: -DBINDINGS_GLFW_INCLUDE_VULKAN
-
 --------------------------------------------------------------------------------
 
 test-suite main

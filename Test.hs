@@ -1,6 +1,5 @@
 -- base
 import Control.Concurrent    (threadDelay)
-import Control.Exception     (catch, ErrorCall)
 import Control.Monad         (forM, forM_, when)
 import Data.Char             (isAscii)
 import Data.List             (intercalate, isPrefixOf)
@@ -641,37 +640,34 @@ test_glfwGetRequiredInstanceExtensions = do
 test_glfwGetInstanceProcAddress :: IO ()
 test_glfwGetInstanceProcAddress = do
     support <- c'glfwVulkanSupported
-    flip catch (\e -> putStrLn $ "WARNING: " ++ show (e :: ErrorCall)) $
-      if support == 1
-      then do
+    if support == 1
+    then do
         shouldBeNull <- withCString "notafunction" $
                         \s -> c'glfwGetInstanceProcAddress nullPtr s
         shouldBeNull @?= nullFunPtr
         assertBool "Function pointer is defined!" $
           p'glfwGetInstanceProcAddress /= nullFunPtr
-      else return ()
+    else return ()
 
 test_glfwGetPhysicalDevicePresentationSupport :: IO ()
 test_glfwGetPhysicalDevicePresentationSupport = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    flip catch (\e -> putStrLn $ "WARNING: " ++ show (e :: ErrorCall)) $
-      if support == 1
-      then do
+    if support == 1
+    then do
         shouldBeFalse <-
           c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
         shouldBeFalse @?= c'GLFW_FALSE
         assertBool "Function pointer is defined!" $
           p'glfwGetPhysicalDevicePresentationSupport /= nullFunPtr
-      else return ()
+    else return ()
 
 test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
 test_glfwCreateWindowSurface p'win = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    flip catch (\e -> putStrLn $ "WARNING: " ++ show (e :: ErrorCall)) $
-      if support == 1
-      then do
+    if support == 1
+    then do
         alloca $ \p'surface -> do
           let resPtr = p'surface :: Ptr ()
           shouldNotBeSuccessful <-
@@ -680,7 +676,6 @@ test_glfwCreateWindowSurface p'win = do
             shouldNotBeSuccessful /= 0
         assertBool "Function pointer is defined!" $
           p'glfwCreateWindowSurface /= nullFunPtr
-      else return ()
-
+    else return ()
 
 {-# ANN module "HLint: ignore Use camelCase" #-}
