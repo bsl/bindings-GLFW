@@ -446,7 +446,6 @@ test_cursor_pos p'win =
         c'glfwPollEvents
 
         c'glfwSetCursorPos p'win cx cy
-        giveItTime
         c'glfwGetCursorPos p'win p'cx' p'cy'
         cx' <- peek p'cx'
         cy' <- peek p'cy'
