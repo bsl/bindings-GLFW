@@ -456,13 +456,18 @@ test_cursor_pos p'win =
             cy :: CDouble
             (cx, cy) = (fromIntegral $ w `div` 2, fromIntegral $ h `div` 2)
 
-        -- !HACK! Poll events seems to be necessary on OS X. Otherwise, the
+        -- !HACK! Poll events seems to be necessary on OS X,
+        -- before /and/ after glfwSetCursorPos, otherwise, the
         -- windowing system likely never receives the cursor update. This is
         -- reflected in the C version of GLFW as well, we just call it here in
         -- order to have a more robust test.
+
         c'glfwPollEvents
 
         c'glfwSetCursorPos p'win cx cy
+
+        c'glfwPollEvents -- !HACK! see comment above
+
         c'glfwGetCursorPos p'win p'cx' p'cy'
         cx' <- peek p'cx'
         cy' <- peek p'cy'
