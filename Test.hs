@@ -338,6 +338,7 @@ test_window_pos p'win = do
     setGet :: Int -> Int -> IO (Int, Int, Int, Int)
     setGet x0 y0 = do
         c'glfwSetWindowPos p'win (fromIntegral x0) (fromIntegral y0)
+        c'glfwSwapBuffers p'win
         giveItTime
         alloca $ \p'x1 ->
           alloca $ \p'y1 -> do
@@ -387,6 +388,7 @@ test_glfwGetFramebufferSize p'win =
 
 test_iconification :: Ptr C'GLFWwindow -> IO ()
 test_iconification p'win = do
+    c'glfwShowWindow p'win
     r0 <- c'glfwGetWindowAttrib p'win c'GLFW_ICONIFIED
     r0 @?= c'GLFW_FALSE
 
@@ -397,6 +399,7 @@ test_iconification p'win = do
     r1 @?= c'GLFW_TRUE
 
     c'glfwRestoreWindow p'win
+    c'glfwHideWindow p'win
 
 -- test_show_hide :: Ptr C'GLFWwindow -> IO ()
 -- test_show_hide p'win = do
@@ -446,6 +449,7 @@ test_cursor_pos p'win =
     alloca $ \p'h   ->
     alloca $ \p'cx' ->
     alloca $ \p'cy' -> do
+        c'glfwShowWindow p'win
         c'glfwGetWindowSize p'win p'w p'h
         w <- peek p'w
         h <- peek p'h
@@ -473,6 +477,7 @@ test_cursor_pos p'win =
         cy' <- peek p'cy'
         cx' @?= cx
         cy' @?= cy
+        c'glfwHideWindow p'win
 
 test_glfwGetWindowAttrib :: Ptr C'GLFWwindow -> IO ()
 test_glfwGetWindowAttrib p'win = do
@@ -488,13 +493,16 @@ test_glfwGetWindowAttrib p'win = do
 
 test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwMaximizeWindow p'win = do
+    c'glfwShowWindow p'win
     startsMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
     startsMaximized @?= c'GLFW_FALSE
 
     c'glfwMaximizeWindow p'win
+    giveItTime
 
     isMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
     isMaximized @?= c'GLFW_TRUE
+    c'glfwHideWindow p'win
 
 test_glfwPollEvents :: IO ()
 test_glfwPollEvents =
