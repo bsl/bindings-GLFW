@@ -4,13 +4,14 @@ import Control.Monad         (forM, forM_, when)
 import Data.Char             (isAscii)
 import Data.List             (intercalate, isPrefixOf)
 import Foreign.C.String      (peekCString, withCString)
+import Foreign.C.Types       (CDouble(..))
 import Foreign.Marshal.Alloc (alloca)
 import Foreign.Marshal.Array (peekArray)
-import Foreign.Ptr           (Ptr, nullPtr)
+import Foreign.Ptr           (Ptr, nullPtr, nullFunPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
-import Test.HUnit ((@?=), assertBool, assertFailure)
+import Test.HUnit ((@?=), (@?), assertBool, assertFailure)
 
 -- test-framework
 import Test.Framework (Test, defaultMain, testGroup)
@@ -39,10 +40,18 @@ main = do
 
     p'mon <- c'glfwGetPrimaryMonitor
 
-    c'glfwWindowHint c'GLFW_VISIBLE c'GL_FALSE
+    c'glfwWindowHint c'GLFW_VISIBLE c'GLFW_FALSE
     p'win <- withCString "bindings-GLFW test" $ \p'title ->
       c'glfwCreateWindow 100 100 p'title nullPtr nullPtr
     c'glfwMakeContextCurrent p'win
+
+    -- Mostly check for compiling
+    cmcb <- mk'GLFWcharmodsfun $ \win x y ->
+        putStrLn $ "Got char mods callback! " ++ show (win, x, y)
+    _ <- c'glfwSetCharModsCallback p'win cmcb
+    jcb <- mk'GLFWjoystickfun $ \x y ->
+        putStrLn $ "Got joystick callback! " ++ show (x, y)
+    _ <- c'glfwSetJoystickCallback jcb
 
     defaultMain $ tests p'mon p'win
 
@@ -54,7 +63,7 @@ main = do
 
 versionMajor, versionMinor, versionRevision :: Int
 versionMajor    = 3
-versionMinor    = 1
+versionMinor    = 2
 versionRevision = 1
 
 giveItTime :: IO ()
@@ -114,29 +123,42 @@ tests p'mon p'win =
       -- , testCase "gamma ramp"                 $ test_glfwGamma_ramp p'mon
       ]
     , testGroup "Window handling"
-      [ testCase "glfwDefaultWindowHints"   test_glfwDefaultWindowHints
-      , testCase "window close flag"      $ test_window_close_flag p'win
-      , testCase "glfwSetWindowTitle"     $ test_glfwSetWindowTitle p'win
-      , testCase "window pos"             $ test_window_pos p'win
-      , testCase "window size"            $ test_window_size p'win
-      , testCase "glfwGetFramebufferSize" $ test_glfwGetFramebufferSize p'win
-      , testCase "iconification"          $ test_iconification p'win
-      -- , testCase "show/hide"              $ test_show_hide p'win
-      , testCase "glfwGetWindowMonitor"   $ test_glfwGetWindowMonitor p'win p'mon
-      , testCase "cursor pos"             $ test_cursor_pos p'win
-      , testCase "glfwGetWindowAttrib"    $ test_glfwGetWindowAttrib p'win
-      , testCase "glfwPollEvents"           test_glfwPollEvents
-      , testCase "glfwWaitEvents"           test_glfwWaitEvents
+      [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
+      , testCase "window close flag"          $ test_window_close_flag p'win
+      , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
+      , testCase "window pos"                 $ test_window_pos p'win
+      , testCase "window size"                $ test_window_size p'win
+      , testCase "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
+      , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
+      , testCase "iconification"              $ test_iconification p'win
+      -- , testCase "show/hide"                  $ test_show_hide p'win
+      , testCase "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
+      , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
+      , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
+      , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
+      , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
+      , testCase "glfwFocusWindow"            $ test_glfwFocusWindow p'win
+      , testCase "cursor pos"                 $ test_cursor_pos p'win
+      , testCase "glfwPollEvents"               test_glfwPollEvents
+      , testCase "glfwWaitEvents"               test_glfwWaitEvents
+      , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
       [ testCase "glfwJoystickPresent"    test_glfwJoystickPresent
       , testCase "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
       , testCase "glfwGetJoystickButtons" test_glfwGetJoystickButtons
       , testCase "glfwGetJoystickName"    test_glfwGetJoystickName
+      , testCase "glfwGetKeyName"         test_glfwGetKeyName
       ]
     , testGroup "Time"
       [ testCase "glfwGetTime" test_glfwGetTime
       , testCase "glfwSetTime" test_glfwSetTime
+      ]
+    , testGroup "Timers"
+      [ testCase "glfwGetTimerValue"         test_glfwGetTimerValue
+      , testCase "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
       ]
     , testGroup "Context"
       [ testCase "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
@@ -146,6 +168,13 @@ tests p'mon p'win =
       ]
     , testGroup "Clipboard"
       [ testCase "clipboard" $ test_clipboard p'win
+      ]
+    , testGroup "Vulkan"
+      [ testCase "glfwVulkanSupported"                          test_glfwVulkanSupported
+      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
+      , testCase "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
+      , testCase "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
+      , testCase "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
       ]
     ]
 
@@ -275,15 +304,15 @@ test_glfwDefaultWindowHints =
 test_window_close_flag :: Ptr C'GLFWwindow -> IO ()
 test_window_close_flag p'win = do
     r0 <- c'glfwWindowShouldClose p'win
-    r0 @?= c'GL_FALSE
+    r0 @?= c'GLFW_FALSE
 
-    c'glfwSetWindowShouldClose p'win c'GL_TRUE
+    c'glfwSetWindowShouldClose p'win c'GLFW_TRUE
     r1 <- c'glfwWindowShouldClose p'win
-    r1 @?= c'GL_TRUE
+    r1 @?= c'GLFW_TRUE
 
-    c'glfwSetWindowShouldClose p'win c'GL_FALSE
+    c'glfwSetWindowShouldClose p'win c'GLFW_FALSE
     r2 <- c'glfwWindowShouldClose p'win
-    r2 @?= c'GL_FALSE
+    r2 @?= c'GLFW_FALSE
 
 test_glfwSetWindowTitle :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowTitle p'win =
@@ -309,6 +338,7 @@ test_window_pos p'win = do
     setGet :: Int -> Int -> IO (Int, Int, Int, Int)
     setGet x0 y0 = do
         c'glfwSetWindowPos p'win (fromIntegral x0) (fromIntegral y0)
+        c'glfwSwapBuffers p'win
         giveItTime
         alloca $ \p'x1 ->
           alloca $ \p'y1 -> do
@@ -320,8 +350,8 @@ test_window_pos p'win = do
 
 test_window_size :: Ptr C'GLFWwindow -> IO ()
 test_window_size p'win = do
-    let w = 17
-        h = 37
+    let w = 177
+        h = 372
     c'glfwSetWindowSize p'win w h
     giveItTime
     alloca $ \p'w' ->
@@ -331,6 +361,15 @@ test_window_size p'win = do
           h' <- fromIntegral `fmap` peek p'h'
           w' @?= w
           h' @?= h
+
+-- Really all we can say here is that we likely have a title bar, so just check
+-- that the 'frame' around the top edge is > 0.
+test_glfwGetWindowFrameSize :: Ptr C'GLFWwindow -> IO ()
+test_glfwGetWindowFrameSize p'win =
+    alloca $ \p'win_frame_top -> do
+        c'glfwGetWindowFrameSize p'win nullPtr p'win_frame_top nullPtr nullPtr
+        top <- peek p'win_frame_top
+        assertBool "Window has no frame width up top!" $ top > 0
 
 test_glfwGetFramebufferSize :: Ptr C'GLFWwindow -> IO ()
 test_glfwGetFramebufferSize p'win =
@@ -344,80 +383,138 @@ test_glfwGetFramebufferSize p'win =
         h  <- peek p'h
         fw <- peek p'fw
         fh <- peek p'fh
-        fw @?= w
-        fh @?= h
+        ((fw `mod` w) == 0) @? "Framebuffer width multiple of window's"
+        ((fh `mod` h) == 0) @? "Framebuffer height multiple of window's"
 
 test_iconification :: Ptr C'GLFWwindow -> IO ()
 test_iconification p'win = do
+    c'glfwShowWindow p'win
     r0 <- c'glfwGetWindowAttrib p'win c'GLFW_ICONIFIED
-    r0 @?= c'GL_FALSE
+    r0 @?= c'GLFW_FALSE
 
     c'glfwIconifyWindow p'win
     giveItTime
 
     r1 <- c'glfwGetWindowAttrib p'win c'GLFW_ICONIFIED
-    r1 @?= c'GL_TRUE
+    r1 @?= c'GLFW_TRUE
 
     c'glfwRestoreWindow p'win
+    c'glfwHideWindow p'win
 
 -- test_show_hide :: Ptr C'GLFWwindow -> IO ()
 -- test_show_hide p'win = do
 --     v0 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v0 @?= c'GL_FALSE
+--     v0 @?= c'GLFW_FALSE
 
 --     c'glfwShowWindow p'win
 --     giveItTime
 --     v1 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v1 @?= c'GL_TRUE
+--     v1 @?= c'GLFW_TRUE
 
 --     c'glfwHideWindow p'win
 --     giveItTime
 --     v2 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
---     v2 @?= c'GL_FALSE
+--     v2 @?= c'GLFW_FALSE
 
 test_glfwGetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
 test_glfwGetWindowMonitor p'win _ = do
     p'mon <- c'glfwGetWindowMonitor p'win
     p'mon @?= nullPtr
 
+test_glfwSetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
+test_glfwSetWindowMonitor p'win _ = do
+    c'glfwSetWindowMonitor p'win nullPtr 0 0 100 100 60
+
+test_glfwSetWindowIcon :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowIcon p'win = do
+    c'glfwSetWindowIcon p'win 0 nullPtr
+
+test_glfwSetWindowSizeLimits :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowSizeLimits p'win = do
+    c'glfwSetWindowSizeLimits p'win 640 480 1024 768
+
+test_glfwSetWindowAspectRatio :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowAspectRatio p'win = do
+    c'glfwSetWindowAspectRatio p'win c'GLFW_DONT_CARE c'GLFW_DONT_CARE
+
+test_glfwFocusWindow :: Ptr C'GLFWwindow -> IO ()
+test_glfwFocusWindow = c'glfwFocusWindow
+
+-- NOTE: This test seems to fail in X11. This might be due to the asynchronous
+-- nature of focus events in X. We may be able to fix it by waiting for the focus
+-- event before setting the cursor position.
 test_cursor_pos :: Ptr C'GLFWwindow -> IO ()
 test_cursor_pos p'win =
     alloca $ \p'w   ->
     alloca $ \p'h   ->
     alloca $ \p'cx' ->
     alloca $ \p'cy' -> do
+        c'glfwShowWindow p'win
         c'glfwGetWindowSize p'win p'w p'h
         w <- peek p'w
         h <- peek p'h
-        let cx = fromIntegral w / 2
-            cy = fromIntegral h / 2
+
+        -- Make sure we use integral coordinates here so that we don't run into
+        -- platform-dependent differences.
+        let cx :: CDouble
+            cy :: CDouble
+            (cx, cy) = (fromIntegral $ w `div` 2, fromIntegral $ h `div` 2)
+
+        -- !HACK! Poll events seems to be necessary on OS X,
+        -- before /and/ after glfwSetCursorPos, otherwise, the
+        -- windowing system likely never receives the cursor update. This is
+        -- reflected in the C version of GLFW as well, we just call it here in
+        -- order to have a more robust test.
+
+        c'glfwPollEvents
+
         c'glfwSetCursorPos p'win cx cy
-        giveItTime
+
+        c'glfwPollEvents -- !HACK! see comment above
+
         c'glfwGetCursorPos p'win p'cx' p'cy'
         cx' <- peek p'cx'
         cy' <- peek p'cy'
         cx' @?= cx
         cy' @?= cy
+        c'glfwHideWindow p'win
 
 test_glfwGetWindowAttrib :: Ptr C'GLFWwindow -> IO ()
 test_glfwGetWindowAttrib p'win = do
     let pairs =
-          [ ( c'GLFW_FOCUSED,    c'GL_FALSE        )
-          , ( c'GLFW_ICONIFIED,  c'GL_FALSE        )
-          , ( c'GLFW_RESIZABLE,  c'GL_TRUE         )
-          , ( c'GLFW_DECORATED,  c'GL_TRUE         )
+          [ ( c'GLFW_FOCUSED,    c'GLFW_FALSE        )
+          , ( c'GLFW_ICONIFIED,  c'GLFW_FALSE        )
+          , ( c'GLFW_RESIZABLE,  c'GLFW_TRUE         )
+          , ( c'GLFW_DECORATED,  c'GLFW_TRUE         )
           , ( c'GLFW_CLIENT_API, c'GLFW_OPENGL_API )
           ]
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
     rs @?= map snd pairs
+
+test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
+test_glfwMaximizeWindow p'win = do
+    c'glfwShowWindow p'win
+    startsMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
+    startsMaximized @?= c'GLFW_FALSE
+
+    c'glfwMaximizeWindow p'win
+    giveItTime
+
+    isMaximized <- c'glfwGetWindowAttrib p'win c'GLFW_MAXIMIZED
+    isMaximized @?= c'GLFW_TRUE
+    c'glfwHideWindow p'win
 
 test_glfwPollEvents :: IO ()
 test_glfwPollEvents =
     c'glfwPollEvents
 
 test_glfwWaitEvents :: IO ()
-test_glfwWaitEvents =
-    c'glfwWaitEvents
+test_glfwWaitEvents = c'glfwPostEmptyEvent >> c'glfwWaitEvents
+
+test_glfwWaitEventsTimeout :: IO ()
+test_glfwWaitEventsTimeout =
+    -- to not slow down the test too much we set the timeout to 0.001 second :
+    c'glfwWaitEventsTimeout 0.001
 
 --------------------------------------------------------------------------------
 
@@ -425,7 +522,7 @@ test_glfwJoystickPresent :: IO ()
 test_glfwJoystickPresent = do
     _ <- c'glfwJoystickPresent c'GLFW_JOYSTICK_1
     r <- c'glfwJoystickPresent c'GLFW_JOYSTICK_16
-    r @?= c'GL_FALSE
+    r @?= c'GLFW_FALSE
 
 test_glfwGetJoystickAxes :: IO ()
 test_glfwGetJoystickAxes =
@@ -461,6 +558,14 @@ test_glfwGetJoystickName =
             name <- peekCString p'name
             assertBool "" $ not $ null name
 
+test_glfwGetKeyName :: IO ()
+test_glfwGetKeyName =
+    forM_ [c'GLFW_KEY_SLASH, c'GLFW_KEY_PERIOD] $ \k -> do
+        p'name <- c'glfwGetKeyName k 0
+        when (p'name /= nullPtr) $ do
+            name <- peekCString p'name
+            assertBool "" $ not $ null name
+
 --------------------------------------------------------------------------------
 
 test_glfwGetTime :: IO ()
@@ -474,6 +579,18 @@ test_glfwSetTime = do
     c'glfwSetTime (realToFrac t)
     t' <- realToFrac `fmap` c'glfwGetTime
     assertBool "" $ t' `between` (t, t+10)
+
+--------------------------------------------------------------------------------
+
+test_glfwGetTimerValue :: IO ()
+test_glfwGetTimerValue = do
+    val <- c'glfwGetTimerValue
+    assertBool "" $ val > 0
+
+test_glfwGetTimerFrequency :: IO ()
+test_glfwGetTimerFrequency = do
+    freq <- c'glfwGetTimerFrequency
+    assertBool "" $ freq > 0
 
 --------------------------------------------------------------------------------
 
@@ -493,8 +610,8 @@ test_glfwSwapInterval =
 test_glfwExtensionSupported :: IO ()
 test_glfwExtensionSupported = do
     let pairs =
-          [ ( "GL_ARB_multisample", c'GL_TRUE  )
-          , ( "bogus",              c'GL_FALSE )
+          [ ( "GL_ARB_multisample", c'GLFW_TRUE  )
+          , ( "bogus",              c'GLFW_FALSE )
           ]
     rs <- forM (map fst pairs) $ \ext ->
       withCString ext c'glfwExtensionSupported
@@ -514,11 +631,67 @@ test_clipboard p'win = do
     setGet s = do
         withCString s $ \p's ->
           c'glfwSetClipboardString p'win p's
+        threadDelay 100000  -- Give it a little time
         p's' <- c'glfwGetClipboardString p'win
         if p's' == nullPtr
           then return ""
           else peekCString p's'
 
 --------------------------------------------------------------------------------
+
+test_glfwVulkanSupported :: IO ()
+test_glfwVulkanSupported =
+    -- Just test that it doesn't error. If it does, then we have a problem, but
+    -- some platforms (like OS X) don't actually support vulkan.
+    c'glfwVulkanSupported >> return ()
+
+test_glfwGetRequiredInstanceExtensions :: IO ()
+test_glfwGetRequiredInstanceExtensions = do
+    support <- c'glfwVulkanSupported
+    if (support == 1)
+        then alloca $ \p'count ->
+            c'glfwGetRequiredInstanceExtensions p'count >> return ()
+        else return ()
+
+test_glfwGetInstanceProcAddress :: IO ()
+test_glfwGetInstanceProcAddress = do
+    support <- c'glfwVulkanSupported
+    if support == 1
+    then do
+        shouldBeNull <- withCString "notafunction" $
+                        \s -> c'glfwGetInstanceProcAddress nullPtr s
+        shouldBeNull @?= nullFunPtr
+        assertBool "Function pointer is defined!" $
+          p'glfwGetInstanceProcAddress /= nullFunPtr
+    else return ()
+
+test_glfwGetPhysicalDevicePresentationSupport :: IO ()
+test_glfwGetPhysicalDevicePresentationSupport = do
+    -- We don't really have the proper types to test this function
+    support <- c'glfwVulkanSupported
+    if support == 1
+    then do
+        shouldBeFalse <-
+          c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
+        shouldBeFalse @?= c'GLFW_FALSE
+        assertBool "Function pointer is defined!" $
+          p'glfwGetPhysicalDevicePresentationSupport /= nullFunPtr
+    else return ()
+
+test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
+test_glfwCreateWindowSurface p'win = do
+    -- We don't really have the proper types to test this function
+    support <- c'glfwVulkanSupported
+    if support == 1
+    then do
+        alloca $ \p'surface -> do
+          let resPtr = p'surface :: Ptr ()
+          shouldNotBeSuccessful <-
+            c'glfwCreateWindowSurface nullPtr p'win nullPtr resPtr
+          assertBool "c'glfwCreateSurface was successful??" $
+            shouldNotBeSuccessful /= 0
+        assertBool "Function pointer is defined!" $
+          p'glfwCreateWindowSurface /= nullFunPtr
+    else return ()
 
 {-# ANN module "HLint: ignore Use camelCase" #-}

@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.1.2.4
+version:      3.2.1.0
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -126,6 +126,7 @@ library
       glfw/src/input.c
       glfw/src/monitor.c
       glfw/src/window.c
+      glfw/src/vulkan.c
 
     cc-options: -D_GLFW_USE_CONFIG_H
 
@@ -133,25 +134,27 @@ library
       include-dirs:
         glfw/include/os/unix-like
       c-sources:
+        glfw/src/glx_context.c
+        glfw/src/egl_context.c
         glfw/src/xkb_unicode.c
         glfw/src/linux_joystick.c
         glfw/src/posix_time.c
         glfw/src/posix_tls.c
       if flag(X)
+        cc-options: -DBINDINGS_GLFW_USE_X11
         c-sources:
-          glfw/src/glx_context.c
           glfw/src/x11_init.c
           glfw/src/x11_monitor.c
           glfw/src/x11_window.c
       if flag(Wayland)
+        cc-options: -DBINDINGS_GLFW_USE_WAYLAND
         c-sources:
-          glfw/src/egl_context.c
           glfw/src/wl_init.c
           glfw/src/wl_monitor.c
           glfw/src/wl_window.c
       if flag(Mir)
+        cc-options: -DBINDINGS_GLFW_USE_MIR
         c-sources:
-          glfw/src/egl_context.c
           glfw/src/mir_init.c
           glfw/src/mir_monitor.c
           glfw/src/mir_window.c
@@ -170,10 +173,10 @@ library
       include-dirs:
          glfw/include/os/darwin
       c-sources:
-         glfw/src/mach_time.c
+         glfw/src/cocoa_time.c
          glfw/src/posix_tls.c
          glfw/src/cocoa_init.m
-         glfw/src/iokit_joystick.m
+         glfw/src/cocoa_joystick.m
          glfw/src/cocoa_monitor.m
          glfw/src/cocoa_window.m
          glfw/src/nsgl_context.m
@@ -189,8 +192,9 @@ library
       include-dirs:
         glfw/include/os/windows
       c-sources:
+        glfw/src/egl_context.c
         glfw/src/win32_init.c
-        glfw/src/winmm_joystick.c
+        glfw/src/win32_joystick.c
         glfw/src/win32_monitor.c
         glfw/src/win32_time.c
         glfw/src/win32_window.c
@@ -202,7 +206,6 @@ library
 
   if flag(ExposeNative)
     cc-options: -DExposeNative
-
 --------------------------------------------------------------------------------
 
 test-suite main
