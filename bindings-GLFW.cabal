@@ -113,7 +113,7 @@ library
 
   if flag(system-glfw)
     pkgconfig-depends:
-      glfw3 == 3.1.*
+      glfw3 == 3.2.*
   else
     include-dirs:
       glfw/include/GLFW
