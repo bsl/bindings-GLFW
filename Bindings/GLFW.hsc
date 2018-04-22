@@ -489,7 +489,6 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetPhysicalDevicePresentationSupport , Ptr vkInstance -> Ptr vkPhysicalDevice -> Word32 -> IO CInt
 #ccall glfwCreateWindowSurface                  , Ptr vkInstance -> Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
 
-
 --------------------------------------------------------------------------------
 -- Native APIs
 --------------------------------------------------------------------------------

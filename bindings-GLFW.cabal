@@ -3,9 +3,10 @@ version:      3.2.1.1
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
-maintainer:   Schell Scivally <efsubenovex@gmail.com>,
-              Brian Lewis <brian@lorf.org>,
-              Javier Jaramago <jaramago.fernandez.javier@gmail.com>
+maintainer:   Brian Lewis <brian@lorf.org>
+            , Schell Scivally <efsubenovex@gmail.com>
+            , Javier Jaramago <jaramago.fernandez.javier@gmail.com>
+            , Pavel Krajcevski <krajcevski@gmail.com>
 
 license:      BSD3
 license-file: LICENSE
@@ -16,8 +17,8 @@ description:
   multi-platform library for creating windows with OpenGL contexts and managing
   input and events.
   .
-  The binding is to GLFW 3.1, released 2015-01-18
-  (<http://www.glfw.org/Version-3.1-released.html>
+  The binding is to GLFW 3.2, released 2016-08-18
+  (<http://www.glfw.org/Version-3.2-released.html>
   <http://www.glfw.org/changelog.html>).
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
@@ -25,7 +26,7 @@ description:
   .
   If you've used GLFW before, you were probably using 2.7.x. There are some
   significant differences in 3.x.x. Please see the transition guide
-  (<http://www.glfw.org/docs/3.1/moving.html>).
+  (<http://www.glfw.org/docs/3.2/moving.html>).
 
 cabal-version: >= 1.10
 build-type:    Simple
