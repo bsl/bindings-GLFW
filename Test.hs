@@ -119,8 +119,6 @@ tests p'mon p'win =
       , testCase "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
       , testCase "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
       , testCase "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
-      -- , testCase "setGamma"                   $ test_glfwSetGamma p'mon
-      -- , testCase "gamma ramp"                 $ test_glfwGamma_ramp p'mon
       ]
     , testGroup "Window handling"
       [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
@@ -577,8 +575,6 @@ test_glfwSetTime = do
     c'glfwSetTime (realToFrac t)
     t' <- realToFrac `fmap` c'glfwGetTime
     assertBool "" $ t' `between` (t, t+10)
-
---------------------------------------------------------------------------------
 
 test_glfwGetTimerValue :: IO ()
 test_glfwGetTimerValue = do
