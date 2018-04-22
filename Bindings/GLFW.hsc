@@ -52,7 +52,7 @@ import Data.Int         (Int32)
 import Data.Word        (Word32, Word64)
 import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
-import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..), CULong(..))
+import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
 import Foreign.C.String (CString)
 import Foreign.Ptr      (FunPtr, nullFunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
@@ -466,8 +466,8 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowSizeLimits , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
 #ccall glfwSetWindowAspectRatio , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 #ccall glfwGetKeyName , CInt -> CInt -> IO CString
-#ccall glfwGetTimerValue , IO (CULong)
-#ccall glfwGetTimerFrequency , IO (CULong)
+#ccall glfwGetTimerValue , IO Word64
+#ccall glfwGetTimerFrequency , IO Word64
 
 #callback GLFWjoystickfun , CInt -> CInt -> IO ()
 #ccall glfwSetJoystickCallback , <GLFWjoystickfun> -> IO <GLFWjoystickfun>

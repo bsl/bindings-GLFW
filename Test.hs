@@ -153,11 +153,9 @@ tests p'mon p'win =
       , testCase "glfwGetKeyName"         test_glfwGetKeyName
       ]
     , testGroup "Time"
-      [ testCase "glfwGetTime" test_glfwGetTime
-      , testCase "glfwSetTime" test_glfwSetTime
-      ]
-    , testGroup "Timers"
-      [ testCase "glfwGetTimerValue"         test_glfwGetTimerValue
+      [ testCase "glfwGetTime"               test_glfwGetTime
+      , testCase "glfwSetTime"               test_glfwSetTime
+      , testCase "glfwGetTimerValue"         test_glfwGetTimerValue
       , testCase "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
       ]
     , testGroup "Context"
