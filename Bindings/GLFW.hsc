@@ -496,7 +496,7 @@ deriving instance Data     C'GLFWcursor
 
 #if defined(GLFW_EXPOSE_NATIVE_WIN32)
 #ccall glfwGetWin32Adapter , Ptr <GLFWwindow> -> IO CString
-#ccall glfwGetWin32Monitor , Ptr <GLFWwindow> -> IO (Ptr ())
+#ccall glfwGetWin32Monitor , Ptr <GLFWwindow> -> IO CString
 #ccall glfwGetWin32Window  , Ptr <GLFWwindow> -> IO (Ptr ())
 #else
 
@@ -508,10 +508,10 @@ c'glfwGetWin32Adapter =
   error $ "c'glfwGetWin32Adapter undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 
-p'glfwGetWin32Monitor :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr ()))
+p'glfwGetWin32Monitor :: FunPtr (Ptr C'GLFWwindow -> IO CString)
 p'glfwGetWin32Monitor = nullFunPtr
 
-c'glfwGetWin32Monitor :: Ptr C'GLFWwindow -> IO (Ptr ())
+c'glfwGetWin32Monitor :: Ptr C'GLFWwindow -> IO CString
 c'glfwGetWin32Monitor =
   error $ "c'glfwGetWin32Monitor undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
