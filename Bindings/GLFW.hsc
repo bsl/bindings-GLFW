@@ -23,15 +23,15 @@
 
   #elif defined(__linux__)
 
+    #define GLFW_EXPOSE_NATIVE_EGL
+
     #if defined(BINDINGS_GLFW_USE_X11)
       #define GLFW_EXPOSE_NATIVE_X11
       #define GLFW_EXPOSE_NATIVE_GLX
     #elif defined(BINDINGS_GLFW_USE_WAYLAND)
       #define GLFW_EXPOSE_NATIVE_WAYLAND
-      #define GLFW_EXPOSE_NATIVE_EGL
     #elif defined(BINDINGS_GLFW_USE_MIR)
       #define GLFW_EXPOSE_NATIVE_MIR
-      #define GLFW_EXPOSE_NATIVE_EGL
     #endif
 
   #endif
