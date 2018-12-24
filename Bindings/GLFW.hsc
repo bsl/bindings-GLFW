@@ -554,10 +554,10 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwWindowMaximizeFun , Ptr <GLFWwindow> -> CInt -> IO ()
 #ccall glfwWindowContentScaleFun , Ptr <GLFWwindow> -> CFloat -> CFloat -> IO ()
 
--- FIXME: what's the signiture for an array of CType?
+-- FIXME: I believe axes should be an array of floats . . . 
 #starttype GLFWgamepadstate
-#field buttons  , CString -- Is this a string?
-#field axes , CArray CFloat
+#field buttons  , CString
+#field axes , CFloat
 #stoptype
 
 #ccall glfwInitHint , CInt -> CInt -> IO ()
@@ -578,9 +578,10 @@ deriving instance Data     C'GLFWcursor
 
 #ccall glfwSetWindowAttrib , Ptr <GLFWwindow>  -> CInt -> CInt -> IO ()
 
-#ccall glfwSetWindowMaximizeCallback , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
+-- FIXME: What are the types of these callbacks?
+-- #ccall glfwSetWindowMaximizeCallback , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 
-#ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
+-- #ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
 
 #ccall glfwGetKeyScancode , CInt -> IO CInt
 
@@ -861,7 +862,7 @@ c'glfwGetEGLSurface =
 p'glfwGetOSMesaColorBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ()) )
 p'glfwGetOSMesaColorBuffer = nullFunPtr
 
-c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ())
+c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ())
 c'glfwGetOSMesaColorBuffer =
   error $ "c'glfwGetOSMesaColorBuffer undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
