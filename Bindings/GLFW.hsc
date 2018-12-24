@@ -873,3 +873,4 @@ c'glfwGetOSMesaContext ::Ptr C'GLFWwindow -> IO (Ptr ())
 c'glfwGetOSMesaContext = 
   error $ "c'glfwGetOSMesaContext undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
+#endif
