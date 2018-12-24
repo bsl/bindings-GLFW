@@ -13,25 +13,25 @@
 
   #if defined(_WIN32)
 
-    #define GLFW_EXPOSE_NATIVE_WIN32
-    #define GLFW_EXPOSE_NATIVE_WGL
+    #num GLFW_EXPOSE_NATIVE_WIN32
+    #num GLFW_EXPOSE_NATIVE_WGL
 
   #elif defined(__APPLE__)
 
-    #define GLFW_EXPOSE_NATIVE_COCOA
-    #define GLFW_EXPOSE_NATIVE_NSGL
+    #num GLFW_EXPOSE_NATIVE_COCOA
+    #num GLFW_EXPOSE_NATIVE_NSGL
 
   #elif defined(__linux__)
 
-    #define GLFW_EXPOSE_NATIVE_EGL
+    #num GLFW_EXPOSE_NATIVE_EGL
 
     #if defined(BINDINGS_GLFW_USE_X11)
-      #define GLFW_EXPOSE_NATIVE_X11
-      #define GLFW_EXPOSE_NATIVE_GLX
+      #num GLFW_EXPOSE_NATIVE_X11
+      #num GLFW_EXPOSE_NATIVE_GLX
     #elif defined(BINDINGS_GLFW_USE_WAYLAND)
-      #define GLFW_EXPOSE_NATIVE_WAYLAND
+      #num GLFW_EXPOSE_NATIVE_WAYLAND
     #elif defined(BINDINGS_GLFW_USE_MIR)
-      #define GLFW_EXPOSE_NATIVE_MIR
+      #num GLFW_EXPOSE_NATIVE_MIR
     #endif
 
   #endif
@@ -490,6 +490,117 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwCreateWindowSurface                  , Ptr vkInstance -> Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
 
 --------------------------------------------------------------------------------
+-- GLFW f9923e90958e726aaabc86d83fb3681216d76067 additions
+--------------------------------------------------------------------------------
+
+#num GLFW_HAT_CENTERED 
+#num GLFW_HAT_UP                 
+#num GLFW_HAT_RIGHT              
+#num GLFW_HAT_DOWN               
+#num GLFW_HAT_LEFT
+-- The following 4 look like sum types of the previous 5               
+#num GLFW_HAT_RIGHT_UP           
+#num GLFW_HAT_RIGHT_DOWN         
+#num GLFW_HAT_LEFT_UP            
+#num GLFW_HAT_LEFT_DOWN 
+
+#num GLFW_MOD_CAPS_LOCK 
+#num GLFW_MOD_NUM_LOCK 
+
+#num GLFW_GAMEPAD_BUTTON_A               
+#num GLFW_GAMEPAD_BUTTON_B               
+#num GLFW_GAMEPAD_BUTTON_X               
+#num GLFW_GAMEPAD_BUTTON_Y               
+#num GLFW_GAMEPAD_BUTTON_LEFT_BUMPER     
+#num GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER    
+#num GLFW_GAMEPAD_BUTTON_BACK            
+#num GLFW_GAMEPAD_BUTTON_START           
+#num GLFW_GAMEPAD_BUTTON_GUIDE           
+#num GLFW_GAMEPAD_BUTTON_LEFT_THUMB      
+#num GLFW_GAMEPAD_BUTTON_RIGHT_THUMB     
+#num GLFW_GAMEPAD_BUTTON_DPAD_UP         
+#num GLFW_GAMEPAD_BUTTON_DPAD_RIGHT      
+#num GLFW_GAMEPAD_BUTTON_DPAD_DOWN       
+#num GLFW_GAMEPAD_BUTTON_DPAD_LEFT 
+-- folloing 5 are aliases      
+#num GLFW_GAMEPAD_BUTTON_LAST           
+
+#num GLFW_GAMEPAD_BUTTON_CROSS       
+#num GLFW_GAMEPAD_BUTTON_CIRCLE      
+#num GLFW_GAMEPAD_BUTTON_SQUARE      
+#num GLFW_GAMEPAD_BUTTON_TRIANGLE  
+
+#num GLFW_GAMEPAD_AXIS_LEFT_X        
+#num GLFW_GAMEPAD_AXIS_LEFT_Y        
+#num GLFW_GAMEPAD_AXIS_RIGHT_X       
+#num GLFW_GAMEPAD_AXIS_RIGHT_Y       
+#num GLFW_GAMEPAD_AXIS_LEFT_TRIGGER  
+#num GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER 
+-- Alias
+#num GLFW_GAMEPAD_AXIS_LAST
+
+#num GLFW_NO_ERROR
+
+#num GLFW_CENTER_CURSOR 
+#num GLFW_TRANSPARENT_FRAMEBUFFER 
+#num GLFW_FOCUS_ON_SHOW
+#num GLFW_LOCK_KEY_MODS
+#num GLFW_OSMESA_CONTEXT_API
+
+#num GLFW_JOYSTICK_HAT_BUTTONS
+#num GLFW_COCOA_CHDIR_RESOURCES
+#num GLFW_COCOA_MENUBAR
+
+#ccall glfwWindowMaximizeFun , Ptr <GLFWwindow> -> CInt -> IO ()
+#ccall glfwWindowContentScaleFun , Ptr <GLFWwindow> -> CFloat -> CFloat -> IO ()
+
+-- FIXME: what's the signiture for an array of CType?
+#starttype GLFWgamepadstate
+#field buttons  , CString -- Is this a string?
+#field axes , CArray CFloat
+#stoptype
+
+#ccall glfwInitHint , CInt -> CInt -> IO ()
+#ccall glfwGetError , Ptr (Ptr CChar) -> IO CInt
+
+#ccall glfwGetMonitorContentScale , Ptr <GLFWmonitor> -> Ptr CFloat -> Ptr CFloat -> IO ()
+#ccall glfwSetMonitorUserPointer , Ptr <GLFWmonitor> -> Ptr () -> IO ()
+
+#ccall glfwWindowHintString , CInt -> Ptr (Ptr CChar) -> IO ()
+
+#ccall glfwGetWindowContentScale , Ptr <GLFWwindow> -> Ptr CFloat -> Ptr CFloat -> IO ()
+
+#ccall glfwGetWindowOpacity , Ptr <GLFWwindow> -> IO CFloat
+
+#ccall glfwSetWindowOpacity , Ptr <GLFWwindow> -> CFloat -> IO ()
+
+#ccall glfwRequestWindowAttention , Ptr <GLFWwindow> -> IO ()
+
+#ccall glfwSetWindowAttrib , Ptr <GLFWwindow>  -> CInt -> CInt -> IO ()
+
+#ccall glfwSetWindowMaximizeCallback , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
+
+#ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
+
+#ccall glfwGetKeyScancode , CInt -> IO CInt
+
+#ccall glfwGetJoystickHats , CInt -> Ptr CInt -> IO (Ptr (Ptr CUChar))
+
+#ccall glfwGetJoystickGUID , CInt -> IO (Ptr (Ptr CChar))
+
+#ccall glfwSetJoystickUserPointer , CInt -> Ptr () -> IO ()
+
+#ccall glfwGetJoystickUserPointer , CInt -> IO (Ptr ())
+
+#ccall glfwJoystickIsGamepad , CInt -> IO CInt
+
+#ccall glfwUpdateGamepadMappings , Ptr (Ptr CString) -> IO CInt
+
+#ccall glfwGetGamepadName , CInt -> IO (Ptr (Ptr CChar))
+
+#ccall glfwGetGamepadState , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
+
+--------------------------------------------------------------------------------
 -- Native APIs
 --------------------------------------------------------------------------------
 
@@ -574,6 +685,10 @@ c'glfwGetNSGLContext =
 #ccall glfwGetX11Adapter , Ptr <GLFWwindow> -> IO Word64
 #ccall glfwGetX11Monitor , Ptr <GLFWwindow> -> IO Word64
 #ccall glfwGetX11Window  , Ptr <GLFWwindow> -> IO Word64
+
+-- added in f9923e90958e726aaabc86d83fb3681216d76067
+#ccall glfwSetX11SelectionString , Ptr (Ptr CChar) -> IO ()
+#ccall glfwGetX11SelectionString , () -> IO (Ptr (Ptr CChar))
 #else
 p'glfwGetX11Display :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr display))
 p'glfwGetX11Display = nullFunPtr
@@ -606,6 +721,23 @@ c'glfwGetX11Window ::  Ptr C'GLFWwindow -> IO Word64
 c'glfwGetX11Window =
   error $ "c'glfwGetX11Window undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
+
+p'glfwSetX11SelectionString :: FunPtr (Ptr (Ptr CChar) -> IO ())
+p'glfwSetX11SelectionString = nullFunPtr
+
+c'glfwSetX11SelectionString :: Ptr (Ptr CChar) -> IO ()
+c'glfwSetX11SelectionString =
+  error $ "c'glfwSetX11SelectionString undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwGetX11SelectionString :: FunPtr (() -> IO (Ptr (Ptr CChar)))
+p'glfwGetX11SelectionString = nullFunPtr
+
+c'glfwGetX11SelectionString :: () -> IO (Ptr (Ptr CChar))
+c'glfwGetX11SelectionString = 
+  error $ "c'glfwGetX11SelectionString undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
 #endif
 
 #if defined(GLFW_EXPOSE_NATIVE_GLX)
@@ -659,35 +791,36 @@ c'glfwGetWaylandWindow =
        ++ "Did you use the wrong glfw3native API?"
 #endif
 
-#if defined(GLFW_EXPOSE_NATIVE_MIR)
-#ccall glfwGetMirDisplay , IO (Ptr mir_connection)
-#ccall glfwGetMirMonitor , Ptr <GLFWwindow> -> IO CInt
-#ccall glfwGetMirWindow , Ptr <GLFWwindow> -> IO (Ptr mir_surface)
-#else
-p'glfwGetMirDisplay :: FunPtr (IO (Ptr mir_connection))
-p'glfwGetMirDisplay = nullFunPtr
+-- removed in f9923e90958e726aaabc86d83fb3681216d76067
+-- #if defined(GLFW_EXPOSE_NATIVE_MIR)
+-- #ccall glfwGetMirDisplay , IO (Ptr mir_connection)
+-- #ccall glfwGetMirMonitor , Ptr <GLFWwindow> -> IO CInt
+-- #ccall glfwGetMirWindow , Ptr <GLFWwindow> -> IO (Ptr mir_surface)
+-- #else
+-- p'glfwGetMirDisplay :: FunPtr (IO (Ptr mir_connection))
+-- p'glfwGetMirDisplay = nullFunPtr
 
-c'glfwGetMirDisplay :: IO (Ptr mir_connection)
-c'glfwGetMirDisplay =
-  error $ "c'glfwGetMirDisplay undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
+-- c'glfwGetMirDisplay :: IO (Ptr mir_connection)
+-- c'glfwGetMirDisplay =
+--   error $ "c'glfwGetMirDisplay undefined! -- "
+--        ++ "Did you use the wrong glfw3native API?"
 
-p'glfwGetMirMonitor :: FunPtr (Ptr C'GLFWwindow -> IO CInt)
-p'glfwGetMirMonitor = nullFunPtr
+-- p'glfwGetMirMonitor :: FunPtr (Ptr C'GLFWwindow -> IO CInt)
+-- p'glfwGetMirMonitor = nullFunPtr
 
-c'glfwGetMirMonitor :: Ptr C'GLFWwindow -> IO CInt
-c'glfwGetMirMonitor =
-  error $ "c'glfwGetMirMonitor undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
+-- c'glfwGetMirMonitor :: Ptr C'GLFWwindow -> IO CInt
+-- c'glfwGetMirMonitor =
+--   error $ "c'glfwGetMirMonitor undefined! -- "
+--        ++ "Did you use the wrong glfw3native API?"
 
-p'glfwGetMirWindow :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr mir_surface))
-p'glfwGetMirWindow = nullFunPtr
+-- p'glfwGetMirWindow :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr mir_surface))
+-- p'glfwGetMirWindow = nullFunPtr
 
-c'glfwGetMirWindow :: Ptr C'GLFWwindow -> IO (Ptr mir_surface)
-c'glfwGetMirWindow =
-  error $ "c'glfwGetMirWindow undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
-#endif
+-- c'glfwGetMirWindow :: Ptr C'GLFWwindow -> IO (Ptr mir_surface)
+-- c'glfwGetMirWindow =
+--   error $ "c'glfwGetMirWindow undefined! -- "
+--        ++ "Did you use the wrong glfw3native API?"
+-- #endif
 
 #if defined(GLFW_EXPOSE_NATIVE_EGL)
 #ccall glfwGetEGLDisplay , IO (Ptr ())
@@ -719,3 +852,24 @@ c'glfwGetEGLSurface =
        ++ "Did you use the wrong glfw3native API?"
 
 #endif
+
+#if defined(GLFW_EXPOSE_NATIVE_OSMESA)
+#ccall glfwGetOSMesaColorBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ()) -- FIXME: return type of void**?
+#ccall glfwGetOSMesaContext , Ptr <GLFWwindow> -> IO (Ptr ())
+#else 
+
+p'glfwGetOSMesaColorBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ()) )
+p'glfwGetOSMesaColorBuffer = nullFunPtr
+
+c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ())
+c'glfwGetOSMesaColorBuffer =
+  error $ "c'glfwGetOSMesaColorBuffer undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+       
+p'glfwGetOSMesaContext :: FunPtr (C'GLFWwindow -> IO (Ptr ()))
+p'glfwGetOSMesaContext = nullFunPtr
+
+c'glfwGetOSMesaContext ::Ptr C'GLFWwindow -> IO (Ptr ())
+c'glfwGetOSMesaContext = 
+  error $ "c'glfwGetOSMesaContext undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
