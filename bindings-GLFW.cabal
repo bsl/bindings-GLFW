@@ -36,13 +36,17 @@ build-type:    Simple
 extra-source-files:
   README.md
 
-  glfw/deps/EGL/*.h
-  glfw/deps/GL/*.h
+  glfw/deps/glad/*.h
+  glfw/deps/KHR/*.h
+  glfw/deps/vs2008/*.h
+  glfw/deps/vulkan/*.h
+  glfw/deps/*.h
 
-  glfw/include/GLFW/*.h
+  glfw/include/os/darwin/*.h
   glfw/include/os/unix-like/*.h
   glfw/include/os/windows/*.h
-  glfw/include/os/darwin/*.h
+
+  glfw/include/GLFW/*.h
 
   glfw/src/*.c
   glfw/src/*.h
