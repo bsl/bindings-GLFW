@@ -45,7 +45,7 @@
 module Bindings.GLFW where
 
 import Prelude (Eq, IO, Num, Show)
-import Prelude (($), return, error, (++))
+import Prelude (($), return, error, (++), div, undefined, take)
 
 import Data.Data        (Data)
 import Data.Int         (Int32)
@@ -54,6 +54,7 @@ import Data.Typeable    (Typeable)
 import Foreign.C.Types  (CChar, CUChar, CUShort)
 import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
 import Foreign.C.String (CString)
+import Foreign.Marshal.Array (peekArray, pokeArray)
 import Foreign.Ptr      (FunPtr, nullFunPtr, Ptr, plusPtr)
 import Foreign.Storable (Storable(..))
 --------------------------------------------------------------------------------
@@ -551,13 +552,12 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_COCOA_CHDIR_RESOURCES
 #num GLFW_COCOA_MENUBAR
 
-#ccall glfwWindowMaximizeFun , Ptr <GLFWwindow> -> CInt -> IO ()
-#ccall glfwWindowContentScaleFun , Ptr <GLFWwindow> -> CFloat -> CFloat -> IO ()
+#callback GLFWwindowmaximizefun , Ptr <GLFWwindow> -> CInt -> IO ()
+#callback GLFWwindowcontentscalefun , Ptr <GLFWwindow> -> CFloat -> CFloat -> IO ()
 
--- FIXME: I believe axes should be an array of floats . . . 
 #starttype GLFWgamepadstate
-#field buttons  , CString
-#field axes , CFloat
+#array_field buttons  , CUChar
+#array_field axes , CFloat
 #stoptype
 
 #ccall glfwInitHint , CInt -> CInt -> IO ()
@@ -578,10 +578,9 @@ deriving instance Data     C'GLFWcursor
 
 #ccall glfwSetWindowAttrib , Ptr <GLFWwindow>  -> CInt -> CInt -> IO ()
 
--- FIXME: What are the types of these callbacks?
--- #ccall glfwSetWindowMaximizeCallback , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
+#ccall glfwSetWindowMaximizeCallback , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 
--- #ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
+#ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
 
 #ccall glfwGetKeyScancode , CInt -> IO CInt
 

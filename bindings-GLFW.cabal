@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.2.1.1
+version:      3.3.0.1
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -118,7 +118,7 @@ library
 
   if flag(system-glfw)
     pkgconfig-depends:
-      glfw3 == 3.2.*
+      glfw3 == 3.3.*
   else
     include-dirs:
       glfw/include/GLFW
@@ -132,6 +132,7 @@ library
       glfw/src/monitor.c
       glfw/src/window.c
       glfw/src/vulkan.c
+      glfw/src/osmesa_context.c
 
     cc-options: -D_GLFW_USE_CONFIG_H
 
@@ -144,6 +145,7 @@ library
         glfw/src/xkb_unicode.c
         glfw/src/linux_joystick.c
         glfw/src/posix_time.c
+        glfw/src/posix_thread.c
       if flag(X)
         cc-options: -DBINDINGS_GLFW_USE_X11
         c-sources:
@@ -178,6 +180,8 @@ library
          glfw/src/cocoa_monitor.m
          glfw/src/cocoa_window.m
          glfw/src/nsgl_context.m
+         glfw/src/egl_context.c
+         glfw/src/posix_thread.c
       if !flag(MacOSXUseChdir)
         cc-options: -UGLFW_USE_CHDIR
       if !flag(MacOSXUseMenubar)
@@ -197,6 +201,7 @@ library
         glfw/src/win32_time.c
         glfw/src/win32_window.c
         glfw/src/win32_tls.c
+        glfw/src/win32_thread.c
         glfw/src/wgl_context.c
       extra-libraries:
         opengl32
