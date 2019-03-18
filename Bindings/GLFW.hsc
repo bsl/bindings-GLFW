@@ -544,7 +544,14 @@ deriving instance Data     C'GLFWcursor
 
 #num GLFW_CENTER_CURSOR 
 #num GLFW_TRANSPARENT_FRAMEBUFFER 
+#num GLFW_HOVERED
 #num GLFW_FOCUS_ON_SHOW
+#num GLFW_SCALE_TO_MONITOR
+#num GLFW_COCOA_RETINA_FRAMEBUFFER
+#num GLFW_COCOA_FRAME_NAME
+#num GLFW_COCOA_GRAPHICS_SWITCHING
+#num GLFW_X11_CLASS_NAME
+#num GLFW_X11_INSTANCE_NAME
 #num GLFW_LOCK_KEY_MODS
 #num GLFW_OSMESA_CONTEXT_API
 
@@ -561,12 +568,13 @@ deriving instance Data     C'GLFWcursor
 #stoptype
 
 #ccall glfwInitHint , CInt -> CInt -> IO ()
-#ccall glfwGetError , Ptr (Ptr CChar) -> IO CInt
+#ccall glfwGetError , Ptr CString -> IO CInt
 
 #ccall glfwGetMonitorContentScale , Ptr <GLFWmonitor> -> Ptr CFloat -> Ptr CFloat -> IO ()
 #ccall glfwSetMonitorUserPointer , Ptr <GLFWmonitor> -> Ptr () -> IO ()
+#ccall glfwGetMonitorUserPointer , Ptr <GLFWmonitor> -> IO (Ptr ())
 
-#ccall glfwWindowHintString , CInt -> Ptr (Ptr CChar) -> IO ()
+#ccall glfwWindowHintString , CInt -> CString -> IO ()
 
 #ccall glfwGetWindowContentScale , Ptr <GLFWwindow> -> Ptr CFloat -> Ptr CFloat -> IO ()
 
@@ -584,9 +592,9 @@ deriving instance Data     C'GLFWcursor
 
 #ccall glfwGetKeyScancode , CInt -> IO CInt
 
-#ccall glfwGetJoystickHats , CInt -> Ptr CInt -> IO (Ptr (Ptr CUChar))
+#ccall glfwGetJoystickHats , CInt -> Ptr CInt -> IO (Ptr CUChar)
 
-#ccall glfwGetJoystickGUID , CInt -> IO (Ptr (Ptr CChar))
+#ccall glfwGetJoystickGUID , CInt -> IO CString
 
 #ccall glfwSetJoystickUserPointer , CInt -> Ptr () -> IO ()
 
@@ -594,9 +602,9 @@ deriving instance Data     C'GLFWcursor
 
 #ccall glfwJoystickIsGamepad , CInt -> IO CInt
 
-#ccall glfwUpdateGamepadMappings , Ptr (Ptr CString) -> IO CInt
+#ccall glfwUpdateGamepadMappings , CString -> IO CInt
 
-#ccall glfwGetGamepadName , CInt -> IO (Ptr (Ptr CChar))
+#ccall glfwGetGamepadName , CInt -> IO CString
 
 #ccall glfwGetGamepadState , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
 
@@ -687,8 +695,8 @@ c'glfwGetNSGLContext =
 #ccall glfwGetX11Window  , Ptr <GLFWwindow> -> IO Word64
 
 -- added in f9923e90958e726aaabc86d83fb3681216d76067
-#ccall glfwSetX11SelectionString , Ptr (Ptr CChar) -> IO ()
-#ccall glfwGetX11SelectionString , () -> IO (Ptr (Ptr CChar))
+#ccall glfwSetX11SelectionString , CString -> IO ()
+#ccall glfwGetX11SelectionString , () -> IO CString
 #else
 p'glfwGetX11Display :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr display))
 p'glfwGetX11Display = nullFunPtr
@@ -722,18 +730,18 @@ c'glfwGetX11Window =
   error $ "c'glfwGetX11Window undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 
-p'glfwSetX11SelectionString :: FunPtr (Ptr (Ptr CChar) -> IO ())
+p'glfwSetX11SelectionString :: FunPtr (CString -> IO ())
 p'glfwSetX11SelectionString = nullFunPtr
 
-c'glfwSetX11SelectionString :: Ptr (Ptr CChar) -> IO ()
+c'glfwSetX11SelectionString :: CString -> IO ()
 c'glfwSetX11SelectionString =
   error $ "c'glfwSetX11SelectionString undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 
-p'glfwGetX11SelectionString :: FunPtr (() -> IO (Ptr (Ptr CChar)))
+p'glfwGetX11SelectionString :: FunPtr (() -> IO CString)
 p'glfwGetX11SelectionString = nullFunPtr
 
-c'glfwGetX11SelectionString :: () -> IO (Ptr (Ptr CChar))
+c'glfwGetX11SelectionString :: () -> IO CString
 c'glfwGetX11SelectionString = 
   error $ "c'glfwGetX11SelectionString undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
@@ -854,16 +862,25 @@ c'glfwGetEGLSurface =
 #endif
 
 #if defined(GLFW_EXPOSE_NATIVE_OSMESA)
-#ccall glfwGetOSMesaColorBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ()) -- FIXME: return type of void**?
+#ccall glfwGetOSMesaColorBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+#ccall glfwGetOSMesaDepthBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
 #ccall glfwGetOSMesaContext , Ptr <GLFWwindow> -> IO (Ptr ())
 #else 
 
-p'glfwGetOSMesaColorBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ()) )
+p'glfwGetOSMesaColorBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt)
 p'glfwGetOSMesaColorBuffer = nullFunPtr
 
-c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO (Ptr ())
+c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
 c'glfwGetOSMesaColorBuffer =
   error $ "c'glfwGetOSMesaColorBuffer undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwGetOSMesaDepthBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt )
+p'glfwGetOSMesaDepthBuffer = nullFunPtr
+
+c'glfwGetOSMesaDepthBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+c'glfwGetOSMesaDepthBuffer =
+  error $ "c'glfwGetOSMesaDepthBuffer undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
        
 p'glfwGetOSMesaContext :: FunPtr (C'GLFWwindow -> IO (Ptr ()))
