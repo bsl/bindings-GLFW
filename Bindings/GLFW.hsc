@@ -489,6 +489,14 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwCreateWindowSurface                  , Ptr vkInstance -> Ptr <GLFWwindow> -> Ptr vkAllocationCallbacks -> Ptr vkSurfaceKHR -> IO Int32
 
 --------------------------------------------------------------------------------
+-- GLFW 3.3 additions
+--------------------------------------------------------------------------------
+
+#num GLFW_NO_ERROR
+
+#ccall glfwGetError , Ptr CString -> IO CInt
+
+--------------------------------------------------------------------------------
 -- Native APIs
 --------------------------------------------------------------------------------
 

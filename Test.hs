@@ -11,7 +11,7 @@ import Foreign.Ptr           (Ptr, nullPtr, nullFunPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
-import Test.HUnit ((@?=), (@?), assertBool, assertFailure)
+import Test.HUnit ((@?=), (@?), assertBool, assertFailure, assertEqual)
 
 -- test-framework
 import Test.Framework (Test, defaultMain, testGroup)
@@ -109,6 +109,7 @@ tests p'mon p'win =
     [ testGroup "Initialization and version information"
       [ testCase "glfwGetVersion"       test_glfwGetVersion
       , testCase "glfwGetVersionString" test_glfwGetVersionString
+      , testCase "glfwGetError"         test_glfwGetError
       ]
     , testGroup "Monitor handling"
       [ testCase "glfwGetMonitors"              test_glfwGetMonitors
@@ -199,6 +200,11 @@ test_glfwGetVersionString = do
           assertBool "" $ v `isPrefixOf` vs
         where
           v = intercalate "." $ map show [versionMajor, versionMinor, versionRevision]
+
+test_glfwGetError :: IO ()
+test_glfwGetError =
+  alloca $ \p'err ->
+  c'glfwGetError p'err >>= assertEqual "Discovered GLFW error!" c'GLFW_NO_ERROR
 
 --------------------------------------------------------------------------------
 
