@@ -36,13 +36,10 @@ build-type:    Simple
 extra-source-files:
   README.md
 
-  glfw/deps/EGL/*.h
-  glfw/deps/GL/*.h
+  glfw/deps/glad/*.h
+  glfw/deps/mingw/*.h
 
   glfw/include/GLFW/*.h
-  glfw/include/os/unix-like/*.h
-  glfw/include/os/windows/*.h
-  glfw/include/os/darwin/*.h
 
   glfw/src/*.c
   glfw/src/*.h
@@ -82,11 +79,6 @@ flag Wayland
     Linux only. Determines whether to target the Wayland display server.
   default: False
 
-flag Mir
-  description:
-    Linux only. Determines whether to target the Mir display server.
-  default: False
-
 flag ExposeNative
   description:
     Whether or not to use the native access functions. You most likely do not
@@ -114,51 +106,51 @@ library
 
   if flag(system-glfw)
     pkgconfig-depends:
-      glfw3 == 3.2.*
+      glfw3 == 3.3.*
   else
     include-dirs:
       glfw/include/GLFW
       glfw/include/
+      glfw/deps
       glfw/src
 
     c-sources:
       glfw/src/context.c
+      glfw/src/egl_context.c
       glfw/src/init.c
       glfw/src/input.c
       glfw/src/monitor.c
-      glfw/src/window.c
+      glfw/src/osmesa_context.c
       glfw/src/vulkan.c
-
-    cc-options: -D_GLFW_USE_CONFIG_H
+      glfw/src/window.c
+--      TODO: Incorporate these into OSMesa target...
+--      glfw/src/null_init.c
+--      glfw/src/null_joystick.c
+--      glfw/src/null_monitor.c
+--      glfw/src/null_window.c
+      glfw/deps/glad_gl.c
+      glfw/deps/glad_vulkan.c
 
     if os(linux) || os(freebsd)
-      include-dirs:
-        glfw/include/os/unix-like
       c-sources:
         glfw/src/glx_context.c
-        glfw/src/egl_context.c
         glfw/src/xkb_unicode.c
         glfw/src/linux_joystick.c
         glfw/src/posix_time.c
         glfw/src/posix_tls.c
-      if flag(X)
-        cc-options: -DBINDINGS_GLFW_USE_X11
+        glfw/src/posix_thread.c
+     if flag(X)
+        cc-options: -DBINDINGS_GLFW_USE_X11 -D_GLFW_X11
         c-sources:
           glfw/src/x11_init.c
           glfw/src/x11_monitor.c
           glfw/src/x11_window.c
       if flag(Wayland)
-        cc-options: -DBINDINGS_GLFW_USE_WAYLAND
+        cc-options: -DBINDINGS_GLFW_USE_WAYLAND -D_GLFW_WAYLAND
         c-sources:
           glfw/src/wl_init.c
           glfw/src/wl_monitor.c
           glfw/src/wl_window.c
-      if flag(Mir)
-        cc-options: -DBINDINGS_GLFW_USE_MIR
-        c-sources:
-          glfw/src/mir_init.c
-          glfw/src/mir_monitor.c
-          glfw/src/mir_window.c
 
       extra-libraries:
         GL
@@ -171,16 +163,16 @@ library
         pthread
 
     if os(darwin)
-      include-dirs:
-         glfw/include/os/darwin
       c-sources:
          glfw/src/cocoa_time.c
          glfw/src/posix_tls.c
+         glfw/src/posix_thread.c
          glfw/src/cocoa_init.m
          glfw/src/cocoa_joystick.m
          glfw/src/cocoa_monitor.m
          glfw/src/cocoa_window.m
          glfw/src/nsgl_context.m
+      cc-options: -D_GLFW_COCOA
       if !flag(MacOSXUseChdir)
         cc-options: -UGLFW_USE_CHDIR
       if !flag(MacOSXUseMenubar)
@@ -191,19 +183,20 @@ library
 
     if os(mingw32)
       include-dirs:
-        glfw/include/os/windows
+        glfw/deps
       c-sources:
-        glfw/src/egl_context.c
         glfw/src/win32_init.c
         glfw/src/win32_joystick.c
         glfw/src/win32_monitor.c
         glfw/src/win32_time.c
         glfw/src/win32_window.c
         glfw/src/win32_tls.c
+        glfw/src/win32_thread.c
         glfw/src/wgl_context.c
       extra-libraries:
         opengl32
         Gdi32
+      cc-options: -D_GLFW_WIN32
 
   if flag(ExposeNative)
     cc-options: -DExposeNative
