@@ -30,8 +30,7 @@
       #define GLFW_EXPOSE_NATIVE_GLX
     #elif defined(BINDINGS_GLFW_USE_WAYLAND)
       #define GLFW_EXPOSE_NATIVE_WAYLAND
-    #elif defined(BINDINGS_GLFW_USE_MIR)
-      #define GLFW_EXPOSE_NATIVE_MIR
+      #define GLFW_EXPOSE_NATIVE_EGL
     #endif
 
   #endif
@@ -656,36 +655,6 @@ p'glfwGetWaylandWindow = nullFunPtr
 c'glfwGetWaylandWindow :: Ptr C'GLFWwindow -> IO (Ptr wl_surface)
 c'glfwGetWaylandWindow =
   error $ "c'glfwGetWaylandWindow undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
-#endif
-
-#if defined(GLFW_EXPOSE_NATIVE_MIR)
-#ccall glfwGetMirDisplay , IO (Ptr mir_connection)
-#ccall glfwGetMirMonitor , Ptr <GLFWwindow> -> IO CInt
-#ccall glfwGetMirWindow , Ptr <GLFWwindow> -> IO (Ptr mir_surface)
-#else
-p'glfwGetMirDisplay :: FunPtr (IO (Ptr mir_connection))
-p'glfwGetMirDisplay = nullFunPtr
-
-c'glfwGetMirDisplay :: IO (Ptr mir_connection)
-c'glfwGetMirDisplay =
-  error $ "c'glfwGetMirDisplay undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
-
-p'glfwGetMirMonitor :: FunPtr (Ptr C'GLFWwindow -> IO CInt)
-p'glfwGetMirMonitor = nullFunPtr
-
-c'glfwGetMirMonitor :: Ptr C'GLFWwindow -> IO CInt
-c'glfwGetMirMonitor =
-  error $ "c'glfwGetMirMonitor undefined! -- "
-       ++ "Did you use the wrong glfw3native API?"
-
-p'glfwGetMirWindow :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr mir_surface))
-p'glfwGetMirWindow = nullFunPtr
-
-c'glfwGetMirWindow :: Ptr C'GLFWwindow -> IO (Ptr mir_surface)
-c'glfwGetMirWindow =
-  error $ "c'glfwGetMirWindow undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 #endif
 
