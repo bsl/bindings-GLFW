@@ -539,6 +539,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowContentScaleCallback , <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
 #ccall glfwRequestWindowAttention        , Ptr <GLFWwindow> -> IO ()
 #ccall glfwGetMonitorWorkarea            , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
+#ccall glfwGetKeyScancode                , CInt -> IO CInt
 
 --------------------------------------------------------------------------------
 -- Native APIs

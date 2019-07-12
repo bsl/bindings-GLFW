@@ -170,6 +170,7 @@ tests p'mon p'win =
       , glfwTest "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
       , glfwTest "glfwGetGamepadState"    test_glfwGetGamepadState
       , glfwTest "glfwGetKeyName"         test_glfwGetKeyName
+      , glfwTest "glfwGetKeyScancode"     test_glfwGetKeyScancode
       ]
     , testGroup "Time"
       [ glfwTest "glfwGetTime"               test_glfwGetTime
@@ -655,6 +656,16 @@ test_glfwGetKeyName =
         when (p'name /= nullPtr) $ do
             name <- peekCString p'name
             assertBool "" $ not $ null name
+
+test_glfwGetKeyScancode :: IO ()
+test_glfwGetKeyScancode = do
+    forM_ [c'GLFW_KEY_SLASH, c'GLFW_KEY_PERIOD] $ \k -> do
+        sc <- c'glfwGetKeyScancode k
+        assertBool (mconcat ["Key ", show k, " scancode not found."]) (sc > 0)
+
+    -- According to the docs this should work but it returns 0. This is a GLFW
+    -- bug (at least on OS X).
+    -- c'glfwGetKeyScancode c'GLFW_KEY_UNKNOWN >>= assertEqual "" (-1)
 
 --------------------------------------------------------------------------------
 
