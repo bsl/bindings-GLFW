@@ -107,6 +107,17 @@ videoModeLooksValid vm = and
 
 --------------------------------------------------------------------------------
 
+glfwTest :: String -> IO () -> Test
+glfwTest name test = testCase name $ do
+  _ <- c'glfwGetError nullPtr  -- clear last error
+  test
+  alloca $ \p'errMsg -> do
+    errResult <- c'glfwGetError p'errMsg
+    errMsg <- if errResult == c'GLFW_NO_ERROR then return "" else do
+      msg <- peek p'errMsg >>= peekCString
+      return $ concat ["Test '", name, "' generated error: ", msg]
+    assertEqual errMsg errResult c'GLFW_NO_ERROR
+
 tests :: Ptr C'GLFWmonitor -> Ptr C'GLFWwindow -> [Test]
 tests p'mon p'win =
     [ testGroup "Initialization and version information"
@@ -115,71 +126,71 @@ tests p'mon p'win =
       , testCase "glfwGetError"         test_glfwGetError
       ]
     , testGroup "Monitor handling"
-      [ testCase "glfwGetMonitors"              test_glfwGetMonitors
-      , testCase "glfwGetPrimaryMonitor"        test_glfwGetPrimaryMonitor
-      , testCase "glfwGetMonitorContentScale" $ test_glfwGetMonitorContentScale p'mon
-      , testCase "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
-      , testCase "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
-      , testCase "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
-      , testCase "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
-      , testCase "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
-      , testCase "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
+      [ glfwTest "glfwGetMonitors"              test_glfwGetMonitors
+      , glfwTest "glfwGetPrimaryMonitor"        test_glfwGetPrimaryMonitor
+      , glfwTest "glfwGetMonitorContentScale" $ test_glfwGetMonitorContentScale p'mon
+      , glfwTest "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
+      , glfwTest "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
+      , glfwTest "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
+      , glfwTest "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
+      , glfwTest "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
+      , glfwTest "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
       ]
     , testGroup "Window handling"
-      [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
-      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
-      , testCase "window close flag"          $ test_window_close_flag p'win
-      , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
-      , testCase "window pos"                 $ test_window_pos p'win
-      , testCase "window size"                $ test_window_size p'win
-      , testCase "glfwGetWindowContentSize"   $ test_glfwGetWindowContentScale p'win
-      , testCase "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
-      , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
-      , testCase "iconification"              $ test_iconification p'win
-      -- , testCase "show/hide"                  $ test_show_hide p'win
-      , testCase "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
-      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
-      , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
-      , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
-      , testCase "glfwFocusWindow"            $ test_glfwFocusWindow p'win
-      , testCase "glfwRequestWindowAttention" $ test_glfwRequestWindowAttention p'win
-      , testCase "cursor pos"                 $ test_cursor_pos p'win
-      , testCase "glfwPollEvents"               test_glfwPollEvents
-      , testCase "glfwWaitEvents"               test_glfwWaitEvents
-      , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
+      [ glfwTest "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , glfwTest "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
+      , glfwTest "window close flag"          $ test_window_close_flag p'win
+      , glfwTest "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
+      , glfwTest "window pos"                 $ test_window_pos p'win
+      , glfwTest "window size"                $ test_window_size p'win
+      , glfwTest "glfwGetWindowContentSize"   $ test_glfwGetWindowContentScale p'win
+      , glfwTest "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
+      , glfwTest "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
+      , glfwTest "iconification"              $ test_iconification p'win
+      -- , glfwTest "show/hide"                  $ test_show_hide p'win
+      , glfwTest "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
+      , glfwTest "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
+      , glfwTest "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , glfwTest "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
+      , glfwTest "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
+      , glfwTest "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
+      , glfwTest "glfwFocusWindow"            $ test_glfwFocusWindow p'win
+      , glfwTest "glfwRequestWindowAttention" $ test_glfwRequestWindowAttention p'win
+      , glfwTest "cursor pos"                 $ test_cursor_pos p'win
+      , glfwTest "glfwPollEvents"               test_glfwPollEvents
+      , glfwTest "glfwWaitEvents"               test_glfwWaitEvents
+      , glfwTest "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
-      [ testCase "glfwJoystickPresent"    test_glfwJoystickPresent
-      , testCase "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
-      , testCase "glfwGetJoystickButtons" test_glfwGetJoystickButtons
-      , testCase "glfwGetJoystickName"    test_glfwGetJoystickName
-      , testCase "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
-      , testCase "glfwGetGamepadState"    test_glfwGetGamepadState
-      , testCase "glfwGetKeyName"         test_glfwGetKeyName
+      [ glfwTest "glfwJoystickPresent"    test_glfwJoystickPresent
+      , glfwTest "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
+      , glfwTest "glfwGetJoystickButtons" test_glfwGetJoystickButtons
+      , glfwTest "glfwGetJoystickName"    test_glfwGetJoystickName
+      , glfwTest "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
+      , glfwTest "glfwGetGamepadState"    test_glfwGetGamepadState
+      , glfwTest "glfwGetKeyName"         test_glfwGetKeyName
       ]
     , testGroup "Time"
-      [ testCase "glfwGetTime"               test_glfwGetTime
-      , testCase "glfwSetTime"               test_glfwSetTime
-      , testCase "glfwGetTimerValue"         test_glfwGetTimerValue
-      , testCase "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
+      [ glfwTest "glfwGetTime"               test_glfwGetTime
+      , glfwTest "glfwSetTime"               test_glfwSetTime
+      , glfwTest "glfwGetTimerValue"         test_glfwGetTimerValue
+      , glfwTest "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
       ]
     , testGroup "Context"
-      [ testCase "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
-      , testCase "glfwSwapBuffers"        $ test_glfwSwapBuffers p'win
-      , testCase "glfwSwapInterval"         test_glfwSwapInterval
-      , testCase "glfwExtensionSupported"   test_glfwExtensionSupported
+      [ glfwTest "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
+      , glfwTest "glfwSwapBuffers"        $ test_glfwSwapBuffers p'win
+      , glfwTest "glfwSwapInterval"         test_glfwSwapInterval
+      , glfwTest "glfwExtensionSupported"   test_glfwExtensionSupported
       ]
     , testGroup "Clipboard"
-      [ testCase "clipboard" $ test_clipboard p'win
+      [ glfwTest "clipboard" $ test_clipboard p'win
       ]
     , testGroup "Vulkan"
-      [ testCase "glfwVulkanSupported"                          test_glfwVulkanSupported
-      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
-      , testCase "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
-      , testCase "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
-      , testCase "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
+      [ glfwTest "glfwVulkanSupported"                          test_glfwVulkanSupported
+      , glfwTest "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
+      , glfwTest "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
+      , glfwTest "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
+      , glfwTest "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
       ]
     ]
 
