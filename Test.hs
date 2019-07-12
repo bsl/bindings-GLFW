@@ -144,6 +144,7 @@ tests p'mon p'win =
     , testGroup "Window handling"
       [ glfwTest "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
       , glfwTest "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
+      , glfwTest "glfwSetWindowAttrib"        $ test_glfwSetWindowAttrib p'win
       , glfwTest "window close flag"          $ test_window_close_flag p'win
       , glfwTest "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
       , glfwTest "window pos"                 $ test_window_pos p'win
@@ -557,6 +558,16 @@ test_glfwGetWindowAttrib p'win = do
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
     rs @?= map snd pairs
 
+test_glfwSetWindowAttrib :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowAttrib p'win = do
+    c'glfwSetWindowAttrib p'win c'GLFW_RESIZABLE c'GLFW_FALSE
+    norsz <- c'glfwGetWindowAttrib p'win c'GLFW_RESIZABLE
+    norsz @?= c'GLFW_FALSE
+
+    c'glfwSetWindowAttrib p'win c'GLFW_RESIZABLE c'GLFW_TRUE
+    rsz <- c'glfwGetWindowAttrib p'win c'GLFW_RESIZABLE
+    rsz @?= c'GLFW_TRUE
+
 test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwMaximizeWindow p'win = do
     c'glfwShowWindow p'win
@@ -639,11 +650,12 @@ test_glfwGetGamepadState =
             when (gotMapping == c'GLFW_TRUE) $ do
                 assertBool "Gamepad state is valid" (p'gp /= nullPtr)
 
-                isGamepad <- c'glfwJoystickIsGamepad js
-                assertEqual "Is gamepad" c'GLFW_TRUE isGamepad
+                c'glfwJoystickIsGamepad js
+                  >>= assertEqual "Is gamepad" c'GLFW_TRUE
 
-                pName <- c'glfwGetGamepadName js
-                peekCString pName >>= assertBool "Gamepad has name" . not . null
+                c'glfwGetGamepadName js
+                  >>= peekCString
+                  >>= assertBool "Gamepad has name" . not . null
 
                 gp <- peek p'gp
                 forM_ (c'GLFWgamepadstate'buttons gp) $

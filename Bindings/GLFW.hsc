@@ -542,6 +542,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetMonitorWorkarea            , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 #ccall glfwGetKeyScancode                , CInt -> IO CInt
 #ccall glfwSetWindowMaximizeCallback     , <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
+#ccall glfwSetWindowAttrib               , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 
 --------------------------------------------------------------------------------
 -- Native APIs
