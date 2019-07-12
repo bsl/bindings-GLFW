@@ -700,13 +700,21 @@ test_clipboard p'win = do
       , "xyz 456 !!!"
       ]
     setGet s = do
-        withCString s $ \p's ->
-          c'glfwSetClipboardString p'win p's
+        withCString s $ c'glfwSetClipboardString p'win
         threadDelay 100000  -- Give it a little time
         p's' <- c'glfwGetClipboardString p'win
-        if p's' == nullPtr
-          then return ""
-          else peekCString p's'
+
+        -- See if we generated a known error for the clipboard, which would
+        -- indicate that the format is not supported.
+        errResult <- c'glfwGetError nullPtr
+        if errResult == c'GLFW_FORMAT_UNAVAILABLE
+          then return s
+          else if errResult == c'GLFW_NO_ERROR then do
+            if p's' == nullPtr
+              then return ""
+              else peekCString p's'
+          else do
+            assertFailure "Unexpected error from clipboard"
 
 --------------------------------------------------------------------------------
 
