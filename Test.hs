@@ -149,6 +149,8 @@ tests p'mon p'win =
       , testCase "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
       , testCase "glfwGetJoystickButtons" test_glfwGetJoystickButtons
       , testCase "glfwGetJoystickName"    test_glfwGetJoystickName
+      , testCase "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
+      , testCase "glfwGetGamepadState"    test_glfwGetGamepadState
       , testCase "glfwGetKeyName"         test_glfwGetKeyName
       ]
     , testGroup "Time"
@@ -559,6 +561,35 @@ test_glfwGetJoystickName =
         when (p'name /= nullPtr) $ do
             name <- peekCString p'name
             assertBool "" $ not $ null name
+
+test_glfwGetJoystickGUID :: IO ()
+test_glfwGetJoystickGUID =
+    forM_ joysticks $ \js -> do
+        p'guid <- c'glfwGetJoystickGUID js
+        when (p'guid /= nullPtr) $ do
+            guid <- peekCString p'guid
+            assertBool "" $ not $ null guid
+
+test_glfwGetGamepadState :: IO ()
+test_glfwGetGamepadState =
+    forM_ joysticks $ \js ->
+        alloca $ \p'gp -> do
+            gotMapping <- c'glfwGetGamepadState js p'gp
+            when (gotMapping == c'GLFW_TRUE) $ do
+                assertBool "Gamepad state is valid" (p'gp /= nullPtr)
+
+                isGamepad <- c'glfwJoystickIsGamepad js
+                assertEqual "Is gamepad" c'GLFW_TRUE isGamepad
+
+                pName <- c'glfwGetGamepadName js
+                peekCString pName >>= assertBool "Gamepad has name" . not . null
+
+                gp <- peek p'gp
+                forM_ (c'GLFWgamepadstate'buttons gp) $
+                  assertEqual "Button not pressed" c'GLFW_RELEASE
+
+                forM_ (c'GLFWgamepadstate'axes gp) $
+                  assertEqual "Stick not moved" 0.0
 
 test_glfwGetKeyName :: IO ()
 test_glfwGetKeyName =

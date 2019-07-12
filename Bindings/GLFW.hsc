@@ -44,17 +44,18 @@
 module Bindings.GLFW where
 
 import Prelude (Eq, IO, Num, Show)
-import Prelude (($), return, error, (++))
+import Prelude (($), return, error, (++), undefined, div, take)
 
-import Data.Data        (Data)
-import Data.Int         (Int32)
-import Data.Word        (Word32, Word64)
-import Data.Typeable    (Typeable)
-import Foreign.C.Types  (CChar, CUChar, CUShort)
-import Foreign.C.Types  (CDouble(..), CFloat(..), CInt(..), CUInt(..))
-import Foreign.C.String (CString)
-import Foreign.Ptr      (FunPtr, nullFunPtr, Ptr, plusPtr)
-import Foreign.Storable (Storable(..))
+import Data.Data             (Data)
+import Data.Int              (Int32)
+import Data.Word             (Word32, Word64)
+import Data.Typeable         (Typeable)
+import Foreign.C.Types       (CChar, CUChar, CUShort)
+import Foreign.C.Types       (CDouble(..), CFloat(..), CInt(..), CUInt(..))
+import Foreign.C.String      (CString)
+import Foreign.Marshal.Array (peekArray,pokeArray)
+import Foreign.Ptr           (FunPtr, nullFunPtr, Ptr, plusPtr)
+import Foreign.Storable      (Storable(..))
 --------------------------------------------------------------------------------
 
 #num GLFW_VERSION_MAJOR
@@ -493,8 +494,45 @@ deriving instance Data     C'GLFWcursor
 --------------------------------------------------------------------------------
 
 #num GLFW_NO_ERROR
+#num GLFW_GAMEPAD_BUTTON_A
+#num GLFW_GAMEPAD_BUTTON_B
+#num GLFW_GAMEPAD_BUTTON_X
+#num GLFW_GAMEPAD_BUTTON_Y
+#num GLFW_GAMEPAD_BUTTON_LEFT_BUMPER
+#num GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER
+#num GLFW_GAMEPAD_BUTTON_BACK
+#num GLFW_GAMEPAD_BUTTON_START
+#num GLFW_GAMEPAD_BUTTON_GUIDE
+#num GLFW_GAMEPAD_BUTTON_LEFT_THUMB
+#num GLFW_GAMEPAD_BUTTON_RIGHT_THUMB
+#num GLFW_GAMEPAD_BUTTON_DPAD_UP
+#num GLFW_GAMEPAD_BUTTON_DPAD_RIGHT
+#num GLFW_GAMEPAD_BUTTON_DPAD_DOWN
+#num GLFW_GAMEPAD_BUTTON_DPAD_LEFT
+#num GLFW_GAMEPAD_BUTTON_LAST
+#num GLFW_GAMEPAD_BUTTON_CROSS
+#num GLFW_GAMEPAD_BUTTON_CIRCLE
+#num GLFW_GAMEPAD_BUTTON_SQUARE
+#num GLFW_GAMEPAD_BUTTON_TRIANGLE
+#num GLFW_GAMEPAD_AXIS_LEFT_X
+#num GLFW_GAMEPAD_AXIS_LEFT_Y
+#num GLFW_GAMEPAD_AXIS_RIGHT_X
+#num GLFW_GAMEPAD_AXIS_RIGHT_Y
+#num GLFW_GAMEPAD_AXIS_LEFT_TRIGGER
+#num GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
+#num GLFW_GAMEPAD_AXIS_LAST
 
-#ccall glfwGetError , Ptr CString -> IO CInt
+#starttype GLFWgamepadstate
+#array_field buttons , CUChar
+#array_field axes    , CFloat
+#stoptype
+
+#ccall glfwGetError              , Ptr CString -> IO CInt
+#ccall glfwUpdateGamepadMappings , CString -> IO CInt
+#ccall glfwJoystickIsGamepad     , CInt -> IO CInt
+#ccall glfwGetJoystickGUID       , CInt -> IO CString
+#ccall glfwGetGamepadName        , CInt -> IO CString
+#ccall glfwGetGamepadState       , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
 
 --------------------------------------------------------------------------------
 -- Native APIs
