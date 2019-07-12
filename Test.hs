@@ -60,7 +60,6 @@ main = do
         putStrLn $ "Got window maximize callback! " ++ show (win, x)
     _ <- c'glfwSetWindowMaximizeCallback wmcb
 
-
     defaultMain $ tests p'mon p'win
 
     -- TODO because of how defaultMain works, this code is not reached

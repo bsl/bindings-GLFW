@@ -539,6 +539,16 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_COCOA_CHDIR_RESOURCES
 #num GLFW_COCOA_MENUBAR
 
+-- Window hints
+#num GLFW_TRANSPARENT_FRAMEBUFFER
+#num GLFW_CENTER_CURSOR
+#num GLFW_FOCUS_ON_SHOW
+#num GLFW_SCALE_TO_MONITOR
+#num GLFW_COCOA_RETINA_FRAMEBUFFER
+#num GLFW_COCOA_FRAME_NAME
+#num GLFW_COCOA_GRAPHICS_SWITCHING
+#num GLFW_X11_CLASS_NAME
+
 #starttype GLFWgamepadstate
 #array_field buttons , CUChar
 #array_field axes    , CFloat
@@ -560,6 +570,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowAttrib               , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 #ccall glfwGetJoystickHats               , CInt -> Ptr CInt -> IO (Ptr CUChar)
 #ccall glfwInitHint                      , CInt -> CInt -> IO ()
+#ccall glfwWindowHintString              , CInt -> CString -> IO ()
 
 --------------------------------------------------------------------------------
 -- Native APIs
