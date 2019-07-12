@@ -132,6 +132,7 @@ tests p'mon p'win =
       , glfwTest "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
       , glfwTest "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
       , glfwTest "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
+      , glfwTest "glfwGetMonitorWorkarea"     $ test_glfwGetMonitorWorkarea p'mon
       , glfwTest "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
       , glfwTest "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
       , glfwTest "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
@@ -282,6 +283,22 @@ test_glfwGetMonitorName p'mon = do
           name <- peekCString p'name
           assertBool "" $ length name `between` (0, 20)
           assertBool "" $ all isAscii name
+
+test_glfwGetMonitorWorkarea :: Ptr C'GLFWmonitor -> IO ()
+test_glfwGetMonitorWorkarea p'mon =
+    alloca $ \p'xpos ->
+    alloca $ \p'ypos ->
+    alloca $ \p'w ->
+    alloca $ \p'h -> do
+        c'glfwGetMonitorWorkarea p'mon p'xpos p'ypos p'w p'h
+        xpos <- peek p'xpos
+        ypos <- peek p'ypos
+        w <- peek p'w
+        h <- peek p'h
+        assertBool "Workarea xpos not negative" $ xpos >= 0
+        assertBool "Workarea ypos not negative" $ ypos >= 0
+        assertBool "Workarea width is positive" $ w > 0
+        assertBool "Workarea height is positive" $ h > 0
 
 test_glfwGetVideoModes :: Ptr C'GLFWmonitor -> IO ()
 test_glfwGetVideoModes p'mon =
