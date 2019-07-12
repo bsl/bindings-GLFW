@@ -128,6 +128,7 @@ tests p'mon p'win =
       [ testCase "glfwGetVersion"       test_glfwGetVersion
       , testCase "glfwGetVersionString" test_glfwGetVersionString
       , testCase "glfwGetError"         test_glfwGetError
+      , testCase "glfwRawMouseMotionSupported" test_glfwRawMouseMotionSupported
       ]
     , testGroup "Monitor handling"
       [ glfwTest "glfwGetMonitors"              test_glfwGetMonitors
@@ -233,6 +234,9 @@ test_glfwGetError :: IO ()
 test_glfwGetError =
   alloca $ \p'err ->
   c'glfwGetError p'err >>= assertEqual "Discovered GLFW error!" c'GLFW_NO_ERROR
+
+test_glfwRawMouseMotionSupported :: IO ()
+test_glfwRawMouseMotionSupported = c'glfwRawMouseMotionSupported >> return ()
 
 --------------------------------------------------------------------------------
 

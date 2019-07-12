@@ -577,6 +577,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetMonitorUserPointer         , Ptr <GLFWmonitor> -> IO (Ptr ())
 #ccall glfwSetJoystickUserPointer        , CInt -> Ptr () -> IO ()
 #ccall glfwGetJoystickUserPointer        , CInt -> IO (Ptr ())
+#ccall glfwRawMouseMotionSupported       , IO CInt
 
 --------------------------------------------------------------------------------
 -- Native APIs
