@@ -144,6 +144,7 @@ tests p'mon p'win =
       , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
       , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
       , testCase "glfwFocusWindow"            $ test_glfwFocusWindow p'win
+      , testCase "glfwRequestWindowAttention" $ test_glfwRequestWindowAttention p'win
       , testCase "cursor pos"                 $ test_cursor_pos p'win
       , testCase "glfwPollEvents"               test_glfwPollEvents
       , testCase "glfwWaitEvents"               test_glfwWaitEvents
@@ -468,6 +469,9 @@ test_glfwSetWindowAspectRatio p'win = do
 
 test_glfwFocusWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwFocusWindow = c'glfwFocusWindow
+
+test_glfwRequestWindowAttention :: Ptr C'GLFWwindow -> IO ()
+test_glfwRequestWindowAttention = c'glfwRequestWindowAttention
 
 -- NOTE: This test seems to fail in X11. This might be due to the asynchronous
 -- nature of focus events in X. We may be able to fix it by waiting for the focus
