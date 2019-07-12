@@ -534,6 +534,11 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_HAT_LEFT_UP
 #num GLFW_HAT_LEFT_DOWN
 
+-- Init hints
+#num GLFW_JOYSTICK_HAT_BUTTONS
+#num GLFW_COCOA_CHDIR_RESOURCES
+#num GLFW_COCOA_MENUBAR
+
 #starttype GLFWgamepadstate
 #array_field buttons , CUChar
 #array_field axes    , CFloat
@@ -554,6 +559,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwSetWindowMaximizeCallback     , <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 #ccall glfwSetWindowAttrib               , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 #ccall glfwGetJoystickHats               , CInt -> Ptr CInt -> IO (Ptr CUChar)
+#ccall glfwInitHint                      , CInt -> CInt -> IO ()
 
 --------------------------------------------------------------------------------
 -- Native APIs

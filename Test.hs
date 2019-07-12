@@ -36,6 +36,7 @@ main = do
     -- uncomment next line to test error callback
     -- _ <- c'glfwGetPrimaryMonitor
 
+    c'glfwInitHint c'GLFW_COCOA_CHDIR_RESOURCES c'GLFW_FALSE
     _ <- c'glfwInit
 
     p'mon <- c'glfwGetPrimaryMonitor
