@@ -171,6 +171,7 @@ tests p'mon p'win =
       [ glfwTest "glfwJoystickPresent"    test_glfwJoystickPresent
       , glfwTest "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
       , glfwTest "glfwGetJoystickButtons" test_glfwGetJoystickButtons
+      , glfwTest "glfwGetJoystickHats"    test_glfwGetJoystickHats
       , glfwTest "glfwGetJoystickName"    test_glfwGetJoystickName
       , glfwTest "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
       , glfwTest "glfwGetGamepadState"    test_glfwGetGamepadState
@@ -625,6 +626,20 @@ test_glfwGetJoystickButtons =
                 else do
                     buttons <- peekArray n p'buttons
                     length buttons @?= n
+
+test_glfwGetJoystickHats :: IO ()
+test_glfwGetJoystickHats =
+    forM_ joysticks $ \js ->
+        alloca $ \p'n -> do
+            p'hats <- c'glfwGetJoystickHats js p'n
+            when (p'hats /= nullPtr) $ do
+                n <- fromIntegral `fmap` peek p'n
+                if n <= 0
+                  then assertFailure "No joystick hats??"
+                  else do
+                      hats <- peekArray n p'hats
+                      length hats @?= n
+                      forM_ hats $ assertEqual "Hat is centered" c'GLFW_HAT_CENTERED
 
 test_glfwGetJoystickName :: IO ()
 test_glfwGetJoystickName =

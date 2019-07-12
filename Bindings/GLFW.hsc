@@ -524,6 +524,16 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER
 #num GLFW_GAMEPAD_AXIS_LAST
 
+#num GLFW_HAT_CENTERED
+#num GLFW_HAT_UP
+#num GLFW_HAT_RIGHT
+#num GLFW_HAT_DOWN
+#num GLFW_HAT_LEFT
+#num GLFW_HAT_RIGHT_UP
+#num GLFW_HAT_RIGHT_DOWN
+#num GLFW_HAT_LEFT_UP
+#num GLFW_HAT_LEFT_DOWN
+
 #starttype GLFWgamepadstate
 #array_field buttons , CUChar
 #array_field axes    , CFloat
@@ -543,6 +553,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetKeyScancode                , CInt -> IO CInt
 #ccall glfwSetWindowMaximizeCallback     , <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 #ccall glfwSetWindowAttrib               , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
+#ccall glfwGetJoystickHats               , CInt -> Ptr CInt -> IO (Ptr CUChar)
 
 --------------------------------------------------------------------------------
 -- Native APIs
