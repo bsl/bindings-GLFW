@@ -663,6 +663,13 @@ c'glfwGetNSGLContext =
 #ccall glfwGetX11Adapter , Ptr <GLFWwindow> -> IO Word64
 #ccall glfwGetX11Monitor , Ptr <GLFWwindow> -> IO Word64
 #ccall glfwGetX11Window  , Ptr <GLFWwindow> -> IO Word64
+
+--------------------------------------------------------------------------------
+-- 3.3 Additions
+--------------------------------------------------------------------------------
+#ccall glfwSetX11SelectionString , CString -> IO ()
+#ccall glfwGetX11SelectionString , IO CString
+
 #else
 p'glfwGetX11Display :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr display))
 p'glfwGetX11Display = nullFunPtr
@@ -694,6 +701,22 @@ p'glfwGetX11Window = nullFunPtr
 c'glfwGetX11Window ::  Ptr C'GLFWwindow -> IO Word64
 c'glfwGetX11Window =
   error $ "c'glfwGetX11Window undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwGetX11SelectionString :: FunPtr (IO CString)
+p'glfwGetX11SelectionString = nullFunPtr
+
+c'glfwGetX11SelectionString :: IO CString
+c'glfwGetX11SelectionString =
+  error $ "c'glfwGetX11SelectionString undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwSetX11SelectionString :: FunPtr (CString -> IO ())
+p'glfwSetX11SelectionString = nullFunPtr
+
+c'glfwSetX11SelectionString :: CString -> IO ()
+c'glfwSetX11SelectionString =
+  error $ "c'glfwSetX11SelectionString undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 #endif
 
