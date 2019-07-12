@@ -52,6 +52,9 @@ main = do
     jcb <- mk'GLFWjoystickfun $ \x y ->
         putStrLn $ "Got joystick callback! " ++ show (x, y)
     _ <- c'glfwSetJoystickCallback jcb
+    wcscb <- mk'GLFWwindowcontentscalefun $ \win x y ->
+        putStrLn $ "Got window content scale callback! " ++ show (win, x, y)
+    _ <- c'glfwSetWindowContentScaleCallback wcscb
 
     defaultMain $ tests p'mon p'win
 
@@ -114,6 +117,7 @@ tests p'mon p'win =
     , testGroup "Monitor handling"
       [ testCase "glfwGetMonitors"              test_glfwGetMonitors
       , testCase "glfwGetPrimaryMonitor"        test_glfwGetPrimaryMonitor
+      , testCase "glfwGetMonitorContentScale" $ test_glfwGetMonitorContentScale p'mon
       , testCase "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
       , testCase "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
       , testCase "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
@@ -128,6 +132,7 @@ tests p'mon p'win =
       , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
       , testCase "window pos"                 $ test_window_pos p'win
       , testCase "window size"                $ test_window_size p'win
+      , testCase "glfwGetWindowContentSize"   $ test_glfwGetWindowContentScale p'win
       , testCase "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
       , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
       , testCase "iconification"              $ test_iconification p'win
@@ -225,6 +230,16 @@ test_glfwGetPrimaryMonitor :: IO ()
 test_glfwGetPrimaryMonitor = do
     p'mon <- c'glfwGetPrimaryMonitor
     assertBool "" $ p'mon /= nullPtr
+
+test_glfwGetMonitorContentScale :: Ptr C'GLFWmonitor -> IO ()
+test_glfwGetMonitorContentScale p'mon =
+    alloca $ \p'x ->
+    alloca $ \p'y -> do
+        c'glfwGetMonitorContentScale p'mon p'x p'y
+        x <- peek p'x
+        y <- peek p'y
+        assertBool "Monitor content scale x is defined" $ x > 0
+        assertBool "Monitor content scale y is defined" $ y > 0
 
 test_glfwGetMonitorPos :: Ptr C'GLFWmonitor -> IO ()
 test_glfwGetMonitorPos p'mon =
@@ -419,6 +434,16 @@ test_iconification p'win = do
 --     giveItTime
 --     v2 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
 --     v2 @?= c'GLFW_FALSE
+
+test_glfwGetWindowContentScale :: Ptr C'GLFWwindow -> IO ()
+test_glfwGetWindowContentScale p'win =
+    alloca $ \p'x ->
+    alloca $ \p'y -> do
+        c'glfwGetWindowContentScale p'win p'x p'y
+        x <- peek p'x
+        y <- peek p'y
+        assertBool "Window content scale x is defined" $ x > 0
+        assertBool "Window content scale y is defined" $ y > 0
 
 test_glfwGetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
 test_glfwGetWindowMonitor p'win _ = do

@@ -300,21 +300,22 @@ deriving instance Data     C'GLFWmonitor
 deriving instance Typeable C'GLFWwindow
 deriving instance Data     C'GLFWwindow
 
-#callback GLFWerrorfun           , CInt -> Ptr CChar ->                                IO ()
-#callback GLFWwindowposfun       , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
-#callback GLFWwindowsizefun      , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
-#callback GLFWwindowclosefun     , Ptr <GLFWwindow> ->                                 IO ()
-#callback GLFWwindowrefreshfun   , Ptr <GLFWwindow> ->                                 IO ()
-#callback GLFWwindowfocusfun     , Ptr <GLFWwindow> -> CInt ->                         IO ()
-#callback GLFWwindowiconifyfun   , Ptr <GLFWwindow> -> CInt ->                         IO ()
-#callback GLFWframebuffersizefun , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
-#callback GLFWmousebuttonfun     , Ptr <GLFWwindow> -> CInt -> CInt -> CInt ->         IO ()
-#callback GLFWcursorposfun       , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
-#callback GLFWcursorenterfun     , Ptr <GLFWwindow> -> CInt ->                         IO ()
-#callback GLFWscrollfun          , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
-#callback GLFWkeyfun             , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
-#callback GLFWcharfun            , Ptr <GLFWwindow> -> CUInt ->                        IO ()
-#callback GLFWmonitorfun         , Ptr <GLFWmonitor> -> CInt ->                        IO ()
+#callback GLFWerrorfun              , CInt -> Ptr CChar ->                                IO ()
+#callback GLFWwindowposfun          , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
+#callback GLFWwindowsizefun         , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
+#callback GLFWwindowclosefun        , Ptr <GLFWwindow> ->                                 IO ()
+#callback GLFWwindowrefreshfun      , Ptr <GLFWwindow> ->                                 IO ()
+#callback GLFWwindowfocusfun        , Ptr <GLFWwindow> -> CInt ->                         IO ()
+#callback GLFWwindowiconifyfun      , Ptr <GLFWwindow> -> CInt ->                         IO ()
+#callback GLFWframebuffersizefun    , Ptr <GLFWwindow> -> CInt -> CInt ->                 IO ()
+#callback GLFWmousebuttonfun        , Ptr <GLFWwindow> -> CInt -> CInt -> CInt ->         IO ()
+#callback GLFWcursorposfun          , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
+#callback GLFWcursorenterfun        , Ptr <GLFWwindow> -> CInt ->                         IO ()
+#callback GLFWscrollfun             , Ptr <GLFWwindow> -> CDouble -> CDouble ->           IO ()
+#callback GLFWkeyfun                , Ptr <GLFWwindow> -> CInt -> CInt -> CInt -> CInt -> IO ()
+#callback GLFWcharfun               , Ptr <GLFWwindow> -> CUInt ->                        IO ()
+#callback GLFWmonitorfun            , Ptr <GLFWmonitor> -> CInt ->                        IO ()
+#callback GLFWwindowcontentscalefun , Ptr <GLFWwindow> -> CFloat -> CFloat ->             IO ()
 
 #starttype GLFWvidmode
 #field width       , CInt
@@ -527,12 +528,15 @@ deriving instance Data     C'GLFWcursor
 #array_field axes    , CFloat
 #stoptype
 
-#ccall glfwGetError              , Ptr CString -> IO CInt
-#ccall glfwUpdateGamepadMappings , CString -> IO CInt
-#ccall glfwJoystickIsGamepad     , CInt -> IO CInt
-#ccall glfwGetJoystickGUID       , CInt -> IO CString
-#ccall glfwGetGamepadName        , CInt -> IO CString
-#ccall glfwGetGamepadState       , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
+#ccall glfwGetError                      , Ptr CString -> IO CInt
+#ccall glfwUpdateGamepadMappings         , CString -> IO CInt
+#ccall glfwJoystickIsGamepad             , CInt -> IO CInt
+#ccall glfwGetJoystickGUID               , CInt -> IO CString
+#ccall glfwGetGamepadName                , CInt -> IO CString
+#ccall glfwGetGamepadState               , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
+#ccall glfwGetWindowContentScale         , Ptr <GLFWwindow> -> Ptr CFloat -> Ptr CFloat -> IO ()
+#ccall glfwGetMonitorContentScale        , Ptr <GLFWmonitor> -> Ptr CFloat -> Ptr CFloat -> IO ()
+#ccall glfwSetWindowContentScaleCallback , <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
 
 --------------------------------------------------------------------------------
 -- Native APIs
