@@ -157,6 +157,7 @@ tests p'mon p'win =
       , glfwTest "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
       , glfwTest "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
       , glfwTest "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , glfwTest "glfwSetWindowOpacity"       $ test_glfwSetWindowOpacity p'win
       , glfwTest "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
       , glfwTest "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
       , glfwTest "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
@@ -493,6 +494,14 @@ test_glfwSetWindowMonitor p'win _ = do
 test_glfwSetWindowIcon :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowIcon p'win = do
     c'glfwSetWindowIcon p'win 0 nullPtr
+
+test_glfwSetWindowOpacity :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowOpacity p'win = do
+    let desiredOpacity = 0.27
+    c'glfwSetWindowOpacity p'win desiredOpacity
+    newOpacity <- c'glfwGetWindowOpacity p'win
+    newOpacity @?= desiredOpacity
+    c'glfwSetWindowOpacity p'win 1.0
 
 test_glfwSetWindowSizeLimits :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowSizeLimits p'win = do

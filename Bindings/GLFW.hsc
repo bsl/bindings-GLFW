@@ -571,6 +571,8 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetJoystickHats               , CInt -> Ptr CInt -> IO (Ptr CUChar)
 #ccall glfwInitHint                      , CInt -> CInt -> IO ()
 #ccall glfwWindowHintString              , CInt -> CString -> IO ()
+#ccall glfwGetWindowOpacity              , Ptr <GLFWwindow> -> IO CFloat
+#ccall glfwSetWindowOpacity              , Ptr <GLFWwindow> -> CFloat -> IO ()
 
 --------------------------------------------------------------------------------
 -- Native APIs
