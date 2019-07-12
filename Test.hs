@@ -55,6 +55,10 @@ main = do
     wcscb <- mk'GLFWwindowcontentscalefun $ \win x y ->
         putStrLn $ "Got window content scale callback! " ++ show (win, x, y)
     _ <- c'glfwSetWindowContentScaleCallback wcscb
+    wmcb <- mk'GLFWwindowmaximizefun $ \win x ->
+        putStrLn $ "Got window maximize callback! " ++ show (win, x)
+    _ <- c'glfwSetWindowMaximizeCallback wmcb
+
 
     defaultMain $ tests p'mon p'win
 
@@ -567,8 +571,7 @@ test_glfwMaximizeWindow p'win = do
     c'glfwHideWindow p'win
 
 test_glfwPollEvents :: IO ()
-test_glfwPollEvents =
-    c'glfwPollEvents
+test_glfwPollEvents = c'glfwPollEvents
 
 test_glfwWaitEvents :: IO ()
 test_glfwWaitEvents = c'glfwPostEmptyEvent >> c'glfwWaitEvents

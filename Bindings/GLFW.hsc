@@ -316,6 +316,7 @@ deriving instance Data     C'GLFWwindow
 #callback GLFWcharfun               , Ptr <GLFWwindow> -> CUInt ->                        IO ()
 #callback GLFWmonitorfun            , Ptr <GLFWmonitor> -> CInt ->                        IO ()
 #callback GLFWwindowcontentscalefun , Ptr <GLFWwindow> -> CFloat -> CFloat ->             IO ()
+#callback GLFWwindowmaximizefun     , Ptr <GLFWwindow> -> CInt ->                         IO ()
 
 #starttype GLFWvidmode
 #field width       , CInt
@@ -540,6 +541,7 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwRequestWindowAttention        , Ptr <GLFWwindow> -> IO ()
 #ccall glfwGetMonitorWorkarea            , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 #ccall glfwGetKeyScancode                , CInt -> IO CInt
+#ccall glfwSetWindowMaximizeCallback     , <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 
 --------------------------------------------------------------------------------
 -- Native APIs
