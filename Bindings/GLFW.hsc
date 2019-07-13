@@ -496,6 +496,8 @@ deriving instance Data     C'GLFWcursor
 -- GLFW 3.3 additions
 --------------------------------------------------------------------------------
 
+#num GLFW_OSMESA_CONTEXT_API
+
 #num GLFW_NO_ERROR
 #num GLFW_GAMEPAD_BUTTON_A
 #num GLFW_GAMEPAD_BUTTON_B
@@ -535,6 +537,13 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_HAT_LEFT_UP
 #num GLFW_HAT_LEFT_DOWN
 
+-- Misc
+#num GLFW_HOVERED
+#num GLFW_LOCK_KEY_MODS
+#num GLFW_MOD_CAPS_LOCK
+#num GLFW_MOD_NUM_LOCK
+#num GLFW_RAW_MOUSE_MOTION
+
 -- Init hints
 #num GLFW_JOYSTICK_HAT_BUTTONS
 #num GLFW_COCOA_CHDIR_RESOURCES
@@ -549,6 +558,7 @@ deriving instance Data     C'GLFWcursor
 #num GLFW_COCOA_FRAME_NAME
 #num GLFW_COCOA_GRAPHICS_SWITCHING
 #num GLFW_X11_CLASS_NAME
+#num GLFW_X11_INSTANCE_NAME
 
 #starttype GLFWgamepadstate
 #array_field buttons , CUChar
