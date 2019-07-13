@@ -30,7 +30,8 @@
       #define GLFW_EXPOSE_NATIVE_GLX
     #elif defined(BINDINGS_GLFW_USE_WAYLAND)
       #define GLFW_EXPOSE_NATIVE_WAYLAND
-      #define GLFW_EXPOSE_NATIVE_EGL
+    #elif defined(BINDINGS_GLFW_USE_OSMESA)
+      #define GLFW_EXPOSE_NATIVE_OSMESA
     #endif
 
   #endif
@@ -801,4 +802,34 @@ c'glfwGetEGLSurface =
   error $ "c'glfwGetEGLSurface undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
 
+#endif
+
+#if defined(GLFW_EXPOSE_NATIVE_OSMESA)
+#ccall glfwGetOSMesaColorBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+#ccall glfwGetOSMesaDepthBuffer , Ptr <GLFWwindow> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+#ccall glfwGetOSMesaContext , Ptr <GLFWwindow> -> IO (Ptr ())
+#else
+p'glfwGetOSMesaColorBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt)
+p'glfwGetOSMesaColorBuffer = nullFunPtr
+
+c'glfwGetOSMesaColorBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+c'glfwGetOSMesaColorBuffer =
+  error $ "c'glfwGetOSMesaColorBuffer undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwGetOSMesaDepthBuffer :: FunPtr (Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt)
+p'glfwGetOSMesaDepthBuffer = nullFunPtr
+
+c'glfwGetOSMesaDepthBuffer :: Ptr C'GLFWwindow -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr (Ptr ()) -> IO CInt
+c'glfwGetOSMesaDepthBuffer =
+  error $ "c'glfwGetOSMesaDepthBuffer undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+
+p'glfwGetOSMesaContext :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr ()))
+p'glfwGetOSMesaContext = nullFunPtr
+
+c'glfwGetOSMesaContext :: Ptr C'GLFWwindow -> IO (Ptr ())
+c'glfwGetOSMesaContext =
+  error $ "c'glfwGetOSMesaContext undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
 #endif

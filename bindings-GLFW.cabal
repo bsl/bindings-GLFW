@@ -79,6 +79,11 @@ flag Wayland
     Linux only. Determines whether to target the Wayland display server.
   default: False
 
+flag OSMesa
+  description:
+    Linux only. Determines whether or not to use the Mesa 3D rendering context.
+  default: False
+
 flag ExposeNative
   description:
     Whether or not to use the native access functions. You most likely do not
@@ -123,11 +128,6 @@ library
       glfw/src/osmesa_context.c
       glfw/src/vulkan.c
       glfw/src/window.c
---      TODO: Incorporate these into OSMesa target...
---      glfw/src/null_init.c
---      glfw/src/null_joystick.c
---      glfw/src/null_monitor.c
---      glfw/src/null_window.c
       glfw/deps/glad_gl.c
       glfw/deps/glad_vulkan.c
 
@@ -139,7 +139,7 @@ library
         glfw/src/posix_time.c
         glfw/src/posix_tls.c
         glfw/src/posix_thread.c
-     if flag(X)
+      if flag(X)
         cc-options: -DBINDINGS_GLFW_USE_X11 -D_GLFW_X11
         c-sources:
           glfw/src/x11_init.c
@@ -151,6 +151,13 @@ library
           glfw/src/wl_init.c
           glfw/src/wl_monitor.c
           glfw/src/wl_window.c
+      if flag(OSMesa)
+        cc-options: -DBINDINGS_GLFW_USE_OSMESA -D_GLFW_OSMESA
+        c-sources:
+          glfw/src/null_init.c
+          glfw/src/null_joystick.c
+          glfw/src/null_monitor.c
+          glfw/src/null_window.c
 
       extra-libraries:
         GL
