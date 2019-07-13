@@ -101,12 +101,12 @@ between n (l,h) = n >= l && n <= h
 
 videoModeLooksValid :: C'GLFWvidmode -> Bool
 videoModeLooksValid vm = and
-    [ c'GLFWvidmode'width       vm `between` (0,4000)
-    , c'GLFWvidmode'height      vm `between` (0,4000)
+    [ c'GLFWvidmode'width       vm `between` (0,8192)
+    , c'GLFWvidmode'height      vm `between` (0,8192)
     , c'GLFWvidmode'redBits     vm `between` (0,32)
     , c'GLFWvidmode'greenBits   vm `between` (0,32)
     , c'GLFWvidmode'blueBits    vm `between` (0,32)
-    , c'GLFWvidmode'refreshRate vm `between` (0,120)
+    , c'GLFWvidmode'refreshRate vm `between` (0,240)
     ]
 
 --------------------------------------------------------------------------------
