@@ -26,16 +26,6 @@ import Bindings.GLFW
 
 main :: IO ()
 main = do
-    cb <- mk'GLFWerrorfun $ \errnum p'desc -> do
-        desc <- if p'desc /= nullPtr
-                  then peekCString p'desc
-                  else return "unknown error"
-        putStrLn $ unwords ["###", "error:", show errnum, show desc]
-    _ <- c'glfwSetErrorCallback cb
-
-    -- uncomment next line to test error callback
-    -- _ <- c'glfwGetPrimaryMonitor
-
     c'glfwInitHint c'GLFW_COCOA_CHDIR_RESOURCES c'GLFW_FALSE
     _ <- c'glfwInit
 
@@ -59,6 +49,9 @@ main = do
     wmcb <- mk'GLFWwindowmaximizefun $ \win x ->
         putStrLn $ "Got window maximize callback! " ++ show (win, x)
     _ <- c'glfwSetWindowMaximizeCallback wmcb
+
+    c'glfwGetError nullPtr
+      >>= assertEqual "Got inititialization error!" c'GLFW_NO_ERROR
 
     defaultMain $ tests p'mon p'win
 
