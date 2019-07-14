@@ -137,7 +137,6 @@ library
         glfw/src/xkb_unicode.c
         glfw/src/linux_joystick.c
         glfw/src/posix_time.c
-        glfw/src/posix_tls.c
         glfw/src/posix_thread.c
       if flag(X)
         cc-options: -DBINDINGS_GLFW_USE_X11 -D_GLFW_X11
@@ -172,7 +171,6 @@ library
     if os(darwin)
       c-sources:
          glfw/src/cocoa_time.c
-         glfw/src/posix_tls.c
          glfw/src/posix_thread.c
          glfw/src/cocoa_init.m
          glfw/src/cocoa_joystick.m
@@ -197,7 +195,6 @@ library
         glfw/src/win32_monitor.c
         glfw/src/win32_time.c
         glfw/src/win32_window.c
-        glfw/src/win32_tls.c
         glfw/src/win32_thread.c
         glfw/src/wgl_context.c
       extra-libraries:
