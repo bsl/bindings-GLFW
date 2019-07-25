@@ -497,7 +497,8 @@ test_glfwSetWindowOpacity p'win = do
     let desiredOpacity = 0.27
     c'glfwSetWindowOpacity p'win desiredOpacity
     newOpacity <- c'glfwGetWindowOpacity p'win
-    newOpacity @?= desiredOpacity
+    assertBool "Opacity is roughly the same." $
+        abs (desiredOpacity - newOpacity) < 0.01
     c'glfwSetWindowOpacity p'win 1.0
 
 test_glfwSetWindowSizeLimits :: Ptr C'GLFWwindow -> IO ()
@@ -681,9 +682,6 @@ test_glfwGetGamepadState =
                 gp <- peek p'gp
                 forM_ (c'GLFWgamepadstate'buttons gp) $
                   assertEqual "Button not pressed" c'GLFW_RELEASE
-
-                forM_ (c'GLFWgamepadstate'axes gp) $
-                  assertEqual "Stick not moved" 0.0
 
 test_glfwGetKeyName :: IO ()
 test_glfwGetKeyName =
