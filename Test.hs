@@ -789,50 +789,61 @@ test_glfwVulkanSupported =
 test_glfwGetRequiredInstanceExtensions :: IO ()
 test_glfwGetRequiredInstanceExtensions = do
     support <- c'glfwVulkanSupported
-    if (support == 1)
-        then alloca $ \p'count ->
-            c'glfwGetRequiredInstanceExtensions p'count >> return ()
-        else return ()
+    when (support == c'GLFW_TRUE) $
+        alloca $ \p'count -> do
+            p'exts <- c'glfwGetRequiredInstanceExtensions p'count
+            when (p'exts /= nullPtr) $ do
+                count <- peek p'count
+                assertBool "Got at least some extensions" $ count > 0
 
 test_glfwGetInstanceProcAddress :: IO ()
 test_glfwGetInstanceProcAddress = do
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         shouldBeNull <- withCString "notafunction" $
                         \s -> c'glfwGetInstanceProcAddress nullPtr s
         shouldBeNull @?= nullFunPtr
         assertBool "Function pointer is defined!" $
           p'glfwGetInstanceProcAddress /= nullFunPtr
-    else return ()
 
 test_glfwGetPhysicalDevicePresentationSupport :: IO ()
 test_glfwGetPhysicalDevicePresentationSupport = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         shouldBeFalse <-
-          c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
+            c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
         shouldBeFalse @?= c'GLFW_FALSE
+
+        -- If we pass a nullptr for the instance here then we better get a
+        -- GLFW_API_UNAVAILABLE error since we didn't create the instance with
+        -- the proper extensions...
+        alloca $ \p'errMsg ->
+            c'glfwGetError p'errMsg >>=
+                assertEqual "Got proper vulkan error" c'GLFW_API_UNAVAILABLE
+
         assertBool "Function pointer is defined!" $
           p'glfwGetPhysicalDevicePresentationSupport /= nullFunPtr
-    else return ()
 
 test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
 test_glfwCreateWindowSurface p'win = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         alloca $ \p'surface -> do
           let resPtr = p'surface :: Ptr ()
           shouldNotBeSuccessful <-
             c'glfwCreateWindowSurface nullPtr p'win nullPtr resPtr
           assertBool "c'glfwCreateSurface was successful??" $
             shouldNotBeSuccessful /= 0
+
+        -- The window that we pass here was not created with GLFW_NO_API, so
+        -- the proper error received here seems to be GLFW_INVALID_VALUE
+        alloca $ \p'errMsg ->
+            c'glfwGetError p'errMsg >>=
+                assertEqual "Got proper vulkan error" c'GLFW_INVALID_VALUE
+
         assertBool "Function pointer is defined!" $
           p'glfwCreateWindowSurface /= nullFunPtr
-    else return ()
 
 {-# ANN module "HLint: ignore Use camelCase" #-}
