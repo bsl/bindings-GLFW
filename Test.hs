@@ -45,10 +45,7 @@ main = do
     _ <- c'glfwSetJoystickCallback jcb
     wcscb <- mk'GLFWwindowcontentscalefun $ \win x y ->
         putStrLn $ "Got window content scale callback! " ++ show (win, x, y)
-    _ <- c'glfwSetWindowContentScaleCallback wcscb
-    wmcb <- mk'GLFWwindowmaximizefun $ \win x ->
-        putStrLn $ "Got window maximize callback! " ++ show (win, x)
-    _ <- c'glfwSetWindowMaximizeCallback wmcb
+    _ <- c'glfwSetWindowContentScaleCallback p'win wcscb
 
     c'glfwGetError nullPtr
       >>= assertEqual "Got inititialization error!" c'GLFW_NO_ERROR

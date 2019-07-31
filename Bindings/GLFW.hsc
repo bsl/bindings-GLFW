@@ -573,11 +573,11 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwGetGamepadState               , CInt -> Ptr <GLFWgamepadstate> -> IO CInt
 #ccall glfwGetWindowContentScale         , Ptr <GLFWwindow> -> Ptr CFloat -> Ptr CFloat -> IO ()
 #ccall glfwGetMonitorContentScale        , Ptr <GLFWmonitor> -> Ptr CFloat -> Ptr CFloat -> IO ()
-#ccall glfwSetWindowContentScaleCallback , <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
+#ccall glfwSetWindowContentScaleCallback , Ptr <GLFWwindow> -> <GLFWwindowcontentscalefun> -> IO <GLFWwindowcontentscalefun>
 #ccall glfwRequestWindowAttention        , Ptr <GLFWwindow> -> IO ()
 #ccall glfwGetMonitorWorkarea            , Ptr <GLFWmonitor> -> Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()
 #ccall glfwGetKeyScancode                , CInt -> IO CInt
-#ccall glfwSetWindowMaximizeCallback     , <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
+#ccall glfwSetWindowMaximizeCallback     , Ptr <GLFWwindow> -> <GLFWwindowmaximizefun> -> IO <GLFWwindowmaximizefun>
 #ccall glfwSetWindowAttrib               , Ptr <GLFWwindow> -> CInt -> CInt -> IO ()
 #ccall glfwGetJoystickHats               , CInt -> Ptr CInt -> IO (Ptr CUChar)
 #ccall glfwInitHint                      , CInt -> CInt -> IO ()
