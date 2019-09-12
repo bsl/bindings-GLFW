@@ -11,7 +11,7 @@ import Foreign.Ptr           (Ptr, nullPtr, nullFunPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
-import Test.HUnit ((@?=), (@?), assertBool, assertFailure)
+import Test.HUnit ((@?=), (@?), assertBool, assertFailure, assertEqual)
 
 -- test-framework
 import Test.Framework (Test, defaultMain, testGroup)
@@ -26,16 +26,7 @@ import Bindings.GLFW
 
 main :: IO ()
 main = do
-    cb <- mk'GLFWerrorfun $ \errnum p'desc -> do
-        desc <- if p'desc /= nullPtr
-                  then peekCString p'desc
-                  else return "unknown error"
-        putStrLn $ unwords ["###", "error:", show errnum, show desc]
-    _ <- c'glfwSetErrorCallback cb
-
-    -- uncomment next line to test error callback
-    -- _ <- c'glfwGetPrimaryMonitor
-
+    c'glfwInitHint c'GLFW_COCOA_CHDIR_RESOURCES c'GLFW_FALSE
     _ <- c'glfwInit
 
     p'mon <- c'glfwGetPrimaryMonitor
@@ -52,6 +43,12 @@ main = do
     jcb <- mk'GLFWjoystickfun $ \x y ->
         putStrLn $ "Got joystick callback! " ++ show (x, y)
     _ <- c'glfwSetJoystickCallback jcb
+    wcscb <- mk'GLFWwindowcontentscalefun $ \win x y ->
+        putStrLn $ "Got window content scale callback! " ++ show (win, x, y)
+    _ <- c'glfwSetWindowContentScaleCallback p'win wcscb
+
+    c'glfwGetError nullPtr
+      >>= assertEqual "Got inititialization error!" c'GLFW_NO_ERROR
 
     defaultMain $ tests p'mon p'win
 
@@ -63,8 +60,8 @@ main = do
 
 versionMajor, versionMinor, versionRevision :: Int
 versionMajor    = 3
-versionMinor    = 2
-versionRevision = 1
+versionMinor    = 3
+versionRevision = 0
 
 giveItTime :: IO ()
 giveItTime = threadDelay 500000
@@ -94,83 +91,106 @@ between n (l,h) = n >= l && n <= h
 
 videoModeLooksValid :: C'GLFWvidmode -> Bool
 videoModeLooksValid vm = and
-    [ c'GLFWvidmode'width       vm `between` (0,4000)
-    , c'GLFWvidmode'height      vm `between` (0,4000)
+    [ c'GLFWvidmode'width       vm `between` (0,8192)
+    , c'GLFWvidmode'height      vm `between` (0,8192)
     , c'GLFWvidmode'redBits     vm `between` (0,32)
     , c'GLFWvidmode'greenBits   vm `between` (0,32)
     , c'GLFWvidmode'blueBits    vm `between` (0,32)
-    , c'GLFWvidmode'refreshRate vm `between` (0,120)
+    , c'GLFWvidmode'refreshRate vm `between` (0,240)
     ]
 
 --------------------------------------------------------------------------------
+
+glfwTest :: String -> IO () -> Test
+glfwTest name test = testCase name $ do
+  _ <- c'glfwGetError nullPtr  -- clear last error
+  test
+  alloca $ \p'errMsg -> do
+    errResult <- c'glfwGetError p'errMsg
+    errMsg <- if errResult == c'GLFW_NO_ERROR then return "" else do
+      msg <- peek p'errMsg >>= peekCString
+      return $ concat ["Test '", name, "' generated error: ", msg]
+    assertEqual errMsg errResult c'GLFW_NO_ERROR
 
 tests :: Ptr C'GLFWmonitor -> Ptr C'GLFWwindow -> [Test]
 tests p'mon p'win =
     [ testGroup "Initialization and version information"
       [ testCase "glfwGetVersion"       test_glfwGetVersion
       , testCase "glfwGetVersionString" test_glfwGetVersionString
+      , testCase "glfwGetError"         test_glfwGetError
+      , testCase "glfwRawMouseMotionSupported" test_glfwRawMouseMotionSupported
       ]
     , testGroup "Monitor handling"
-      [ testCase "glfwGetMonitors"              test_glfwGetMonitors
-      , testCase "glfwGetPrimaryMonitor"        test_glfwGetPrimaryMonitor
-      , testCase "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
-      , testCase "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
-      , testCase "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
-      , testCase "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
-      , testCase "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
-      , testCase "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
+      [ glfwTest "glfwGetMonitors"              test_glfwGetMonitors
+      , glfwTest "glfwGetPrimaryMonitor"        test_glfwGetPrimaryMonitor
+      , glfwTest "glfwGetMonitorContentScale" $ test_glfwGetMonitorContentScale p'mon
+      , glfwTest "glfwGetMonitorPos"          $ test_glfwGetMonitorPos p'mon
+      , glfwTest "glfwGetMonitorPhysicalSize" $ test_glfwGetMonitorPhysicalSize p'mon
+      , glfwTest "glfwGetMonitorName"         $ test_glfwGetMonitorName p'mon
+      , glfwTest "glfwGetMonitorWorkarea"     $ test_glfwGetMonitorWorkarea p'mon
+      , glfwTest "glfwGetVideoModes"          $ test_glfwGetVideoModes p'mon
+      , glfwTest "glfwGetVideoMode"           $ test_glfwGetVideoMode p'mon
+      , glfwTest "glfwGetGammaRamp"           $ test_glfwGetGammaRamp p'mon
       ]
     , testGroup "Window handling"
-      [ testCase "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
-      , testCase "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
-      , testCase "window close flag"          $ test_window_close_flag p'win
-      , testCase "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
-      , testCase "window pos"                 $ test_window_pos p'win
-      , testCase "window size"                $ test_window_size p'win
-      , testCase "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
-      , testCase "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
-      , testCase "iconification"              $ test_iconification p'win
-      -- , testCase "show/hide"                  $ test_show_hide p'win
-      , testCase "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
-      , testCase "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
-      , testCase "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
-      , testCase "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
-      , testCase "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
-      , testCase "glfwFocusWindow"            $ test_glfwFocusWindow p'win
-      , testCase "cursor pos"                 $ test_cursor_pos p'win
-      , testCase "glfwPollEvents"               test_glfwPollEvents
-      , testCase "glfwWaitEvents"               test_glfwWaitEvents
-      , testCase "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
+      [ glfwTest "glfwDefaultWindowHints"       test_glfwDefaultWindowHints
+      , glfwTest "glfwGetWindowAttrib"        $ test_glfwGetWindowAttrib p'win
+      , glfwTest "glfwSetWindowAttrib"        $ test_glfwSetWindowAttrib p'win
+      , glfwTest "window close flag"          $ test_window_close_flag p'win
+      , glfwTest "glfwSetWindowTitle"         $ test_glfwSetWindowTitle p'win
+      , glfwTest "window pos"                 $ test_window_pos p'win
+      , glfwTest "window size"                $ test_window_size p'win
+      , glfwTest "glfwGetWindowContentSize"   $ test_glfwGetWindowContentScale p'win
+      , glfwTest "glfwGetWindowFrameSize"     $ test_glfwGetWindowFrameSize p'win
+      , glfwTest "glfwGetFramebufferSize"     $ test_glfwGetFramebufferSize p'win
+      , glfwTest "iconification"              $ test_iconification p'win
+      -- , glfwTest "show/hide"                  $ test_show_hide p'win
+      , glfwTest "glfwGetWindowMonitor"       $ test_glfwGetWindowMonitor p'win p'mon
+      , glfwTest "glfwSetWindowMonitor"       $ test_glfwSetWindowMonitor p'win p'mon
+      , glfwTest "glfwSetWindowIcon"          $ test_glfwSetWindowIcon p'win
+      , glfwTest "glfwSetWindowOpacity"       $ test_glfwSetWindowOpacity p'win
+      , glfwTest "glfwMaximizeWindow"         $ test_glfwMaximizeWindow p'win
+      , glfwTest "glfwSetWindowSizeLimits"    $ test_glfwSetWindowSizeLimits p'win
+      , glfwTest "glfwSetWindowAspectRatio"   $ test_glfwSetWindowAspectRatio p'win
+      , glfwTest "glfwFocusWindow"            $ test_glfwFocusWindow p'win
+      , glfwTest "glfwRequestWindowAttention" $ test_glfwRequestWindowAttention p'win
+      , glfwTest "cursor pos"                 $ test_cursor_pos p'win
+      , glfwTest "glfwPollEvents"               test_glfwPollEvents
+      , glfwTest "glfwWaitEvents"               test_glfwWaitEvents
+      , glfwTest "glfwWaitEventsTimeout"        test_glfwWaitEventsTimeout
       ]
     , testGroup "Input handling"
-      [ testCase "glfwJoystickPresent"    test_glfwJoystickPresent
-      , testCase "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
-      , testCase "glfwGetJoystickButtons" test_glfwGetJoystickButtons
-      , testCase "glfwGetJoystickName"    test_glfwGetJoystickName
-      , testCase "glfwGetKeyName"         test_glfwGetKeyName
+      [ glfwTest "glfwJoystickPresent"    test_glfwJoystickPresent
+      , glfwTest "glfwGetJoystickAxes"    test_glfwGetJoystickAxes
+      , glfwTest "glfwGetJoystickButtons" test_glfwGetJoystickButtons
+      , glfwTest "glfwGetJoystickHats"    test_glfwGetJoystickHats
+      , glfwTest "glfwGetJoystickName"    test_glfwGetJoystickName
+      , glfwTest "glfwGetJoystickGUID"    test_glfwGetJoystickGUID
+      , glfwTest "glfwGetGamepadState"    test_glfwGetGamepadState
+      , glfwTest "glfwGetKeyName"         test_glfwGetKeyName
+      , glfwTest "glfwGetKeyScancode"     test_glfwGetKeyScancode
       ]
     , testGroup "Time"
-      [ testCase "glfwGetTime"               test_glfwGetTime
-      , testCase "glfwSetTime"               test_glfwSetTime
-      , testCase "glfwGetTimerValue"         test_glfwGetTimerValue
-      , testCase "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
+      [ glfwTest "glfwGetTime"               test_glfwGetTime
+      , glfwTest "glfwSetTime"               test_glfwSetTime
+      , glfwTest "glfwGetTimerValue"         test_glfwGetTimerValue
+      , glfwTest "glfwSetTimerFrequency"     test_glfwGetTimerFrequency
       ]
     , testGroup "Context"
-      [ testCase "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
-      , testCase "glfwSwapBuffers"        $ test_glfwSwapBuffers p'win
-      , testCase "glfwSwapInterval"         test_glfwSwapInterval
-      , testCase "glfwExtensionSupported"   test_glfwExtensionSupported
+      [ glfwTest "glfwGetCurrentContext"  $ test_glfwGetCurrentContext p'win
+      , glfwTest "glfwSwapBuffers"        $ test_glfwSwapBuffers p'win
+      , glfwTest "glfwSwapInterval"         test_glfwSwapInterval
+      , glfwTest "glfwExtensionSupported"   test_glfwExtensionSupported
       ]
     , testGroup "Clipboard"
-      [ testCase "clipboard" $ test_clipboard p'win
+      [ glfwTest "clipboard" $ test_clipboard p'win
       ]
     , testGroup "Vulkan"
-      [ testCase "glfwVulkanSupported"                          test_glfwVulkanSupported
-      , testCase "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
-      , testCase "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
-      , testCase "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
-      , testCase "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
+      [ glfwTest "glfwVulkanSupported"                          test_glfwVulkanSupported
+      , glfwTest "glfwGetRequiredInstanceExtensions"            test_glfwGetRequiredInstanceExtensions
+      , glfwTest "glfwGetInstanceProcAddress"                   test_glfwGetInstanceProcAddress
+      , glfwTest "glfwGetPhysicalDevicePresentationSupport"     test_glfwGetPhysicalDevicePresentationSupport
+      , glfwTest "glfwCreateWindowSurface"                    $ test_glfwCreateWindowSurface p'win
       ]
     ]
 
@@ -200,6 +220,14 @@ test_glfwGetVersionString = do
         where
           v = intercalate "." $ map show [versionMajor, versionMinor, versionRevision]
 
+test_glfwGetError :: IO ()
+test_glfwGetError =
+  alloca $ \p'err ->
+  c'glfwGetError p'err >>= assertEqual "Discovered GLFW error!" c'GLFW_NO_ERROR
+
+test_glfwRawMouseMotionSupported :: IO ()
+test_glfwRawMouseMotionSupported = c'glfwRawMouseMotionSupported >> return ()
+
 --------------------------------------------------------------------------------
 
 test_glfwGetMonitors :: IO ()
@@ -217,6 +245,16 @@ test_glfwGetPrimaryMonitor :: IO ()
 test_glfwGetPrimaryMonitor = do
     p'mon <- c'glfwGetPrimaryMonitor
     assertBool "" $ p'mon /= nullPtr
+
+test_glfwGetMonitorContentScale :: Ptr C'GLFWmonitor -> IO ()
+test_glfwGetMonitorContentScale p'mon =
+    alloca $ \p'x ->
+    alloca $ \p'y -> do
+        c'glfwGetMonitorContentScale p'mon p'x p'y
+        x <- peek p'x
+        y <- peek p'y
+        assertBool "Monitor content scale x is defined" $ x > 0
+        assertBool "Monitor content scale y is defined" $ y > 0
 
 test_glfwGetMonitorPos :: Ptr C'GLFWmonitor -> IO ()
 test_glfwGetMonitorPos p'mon =
@@ -247,6 +285,22 @@ test_glfwGetMonitorName p'mon = do
           name <- peekCString p'name
           assertBool "" $ length name `between` (0, 20)
           assertBool "" $ all isAscii name
+
+test_glfwGetMonitorWorkarea :: Ptr C'GLFWmonitor -> IO ()
+test_glfwGetMonitorWorkarea p'mon =
+    alloca $ \p'xpos ->
+    alloca $ \p'ypos ->
+    alloca $ \p'w ->
+    alloca $ \p'h -> do
+        c'glfwGetMonitorWorkarea p'mon p'xpos p'ypos p'w p'h
+        xpos <- peek p'xpos
+        ypos <- peek p'ypos
+        w <- peek p'w
+        h <- peek p'h
+        assertBool "Workarea xpos not negative" $ xpos >= 0
+        assertBool "Workarea ypos not negative" $ ypos >= 0
+        assertBool "Workarea width is positive" $ w > 0
+        assertBool "Workarea height is positive" $ h > 0
 
 test_glfwGetVideoModes :: Ptr C'GLFWmonitor -> IO ()
 test_glfwGetVideoModes p'mon =
@@ -412,6 +466,16 @@ test_iconification p'win = do
 --     v2 <- c'glfwGetWindowAttrib p'win c'GLFW_VISIBLE
 --     v2 @?= c'GLFW_FALSE
 
+test_glfwGetWindowContentScale :: Ptr C'GLFWwindow -> IO ()
+test_glfwGetWindowContentScale p'win =
+    alloca $ \p'x ->
+    alloca $ \p'y -> do
+        c'glfwGetWindowContentScale p'win p'x p'y
+        x <- peek p'x
+        y <- peek p'y
+        assertBool "Window content scale x is defined" $ x > 0
+        assertBool "Window content scale y is defined" $ y > 0
+
 test_glfwGetWindowMonitor :: Ptr C'GLFWwindow -> Ptr C'GLFWmonitor -> IO ()
 test_glfwGetWindowMonitor p'win _ = do
     p'mon <- c'glfwGetWindowMonitor p'win
@@ -425,6 +489,15 @@ test_glfwSetWindowIcon :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowIcon p'win = do
     c'glfwSetWindowIcon p'win 0 nullPtr
 
+test_glfwSetWindowOpacity :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowOpacity p'win = do
+    let desiredOpacity = 0.27
+    c'glfwSetWindowOpacity p'win desiredOpacity
+    newOpacity <- c'glfwGetWindowOpacity p'win
+    assertBool "Opacity is roughly the same." $
+        abs (desiredOpacity - newOpacity) < 0.01
+    c'glfwSetWindowOpacity p'win 1.0
+
 test_glfwSetWindowSizeLimits :: Ptr C'GLFWwindow -> IO ()
 test_glfwSetWindowSizeLimits p'win = do
     c'glfwSetWindowSizeLimits p'win 640 480 1024 768
@@ -435,6 +508,9 @@ test_glfwSetWindowAspectRatio p'win = do
 
 test_glfwFocusWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwFocusWindow = c'glfwFocusWindow
+
+test_glfwRequestWindowAttention :: Ptr C'GLFWwindow -> IO ()
+test_glfwRequestWindowAttention = c'glfwRequestWindowAttention
 
 -- NOTE: This test seems to fail in X11. This might be due to the asynchronous
 -- nature of focus events in X. We may be able to fix it by waiting for the focus
@@ -487,6 +563,16 @@ test_glfwGetWindowAttrib p'win = do
     rs <- mapM (c'glfwGetWindowAttrib p'win . fst) pairs
     rs @?= map snd pairs
 
+test_glfwSetWindowAttrib :: Ptr C'GLFWwindow -> IO ()
+test_glfwSetWindowAttrib p'win = do
+    c'glfwSetWindowAttrib p'win c'GLFW_RESIZABLE c'GLFW_FALSE
+    norsz <- c'glfwGetWindowAttrib p'win c'GLFW_RESIZABLE
+    norsz @?= c'GLFW_FALSE
+
+    c'glfwSetWindowAttrib p'win c'GLFW_RESIZABLE c'GLFW_TRUE
+    rsz <- c'glfwGetWindowAttrib p'win c'GLFW_RESIZABLE
+    rsz @?= c'GLFW_TRUE
+
 test_glfwMaximizeWindow :: Ptr C'GLFWwindow -> IO ()
 test_glfwMaximizeWindow p'win = do
     c'glfwShowWindow p'win
@@ -501,8 +587,7 @@ test_glfwMaximizeWindow p'win = do
     c'glfwHideWindow p'win
 
 test_glfwPollEvents :: IO ()
-test_glfwPollEvents =
-    c'glfwPollEvents
+test_glfwPollEvents = c'glfwPollEvents
 
 test_glfwWaitEvents :: IO ()
 test_glfwWaitEvents = c'glfwPostEmptyEvent >> c'glfwWaitEvents
@@ -546,6 +631,20 @@ test_glfwGetJoystickButtons =
                     buttons <- peekArray n p'buttons
                     length buttons @?= n
 
+test_glfwGetJoystickHats :: IO ()
+test_glfwGetJoystickHats =
+    forM_ joysticks $ \js ->
+        alloca $ \p'n -> do
+            p'hats <- c'glfwGetJoystickHats js p'n
+            when (p'hats /= nullPtr) $ do
+                n <- fromIntegral `fmap` peek p'n
+                if n <= 0
+                  then assertFailure "No joystick hats??"
+                  else do
+                      hats <- peekArray n p'hats
+                      length hats @?= n
+                      forM_ hats $ assertEqual "Hat is centered" c'GLFW_HAT_CENTERED
+
 test_glfwGetJoystickName :: IO ()
 test_glfwGetJoystickName =
     forM_ joysticks $ \js -> do
@@ -554,6 +653,33 @@ test_glfwGetJoystickName =
             name <- peekCString p'name
             assertBool "" $ not $ null name
 
+test_glfwGetJoystickGUID :: IO ()
+test_glfwGetJoystickGUID =
+    forM_ joysticks $ \js -> do
+        p'guid <- c'glfwGetJoystickGUID js
+        when (p'guid /= nullPtr) $ do
+            guid <- peekCString p'guid
+            assertBool "" $ not $ null guid
+
+test_glfwGetGamepadState :: IO ()
+test_glfwGetGamepadState =
+    forM_ joysticks $ \js ->
+        alloca $ \p'gp -> do
+            gotMapping <- c'glfwGetGamepadState js p'gp
+            when (gotMapping == c'GLFW_TRUE) $ do
+                assertBool "Gamepad state is valid" (p'gp /= nullPtr)
+
+                c'glfwJoystickIsGamepad js
+                  >>= assertEqual "Is gamepad" c'GLFW_TRUE
+
+                c'glfwGetGamepadName js
+                  >>= peekCString
+                  >>= assertBool "Gamepad has name" . not . null
+
+                gp <- peek p'gp
+                forM_ (c'GLFWgamepadstate'buttons gp) $
+                  assertEqual "Button not pressed" c'GLFW_RELEASE
+
 test_glfwGetKeyName :: IO ()
 test_glfwGetKeyName =
     forM_ [c'GLFW_KEY_SLASH, c'GLFW_KEY_PERIOD] $ \k -> do
@@ -561,6 +687,16 @@ test_glfwGetKeyName =
         when (p'name /= nullPtr) $ do
             name <- peekCString p'name
             assertBool "" $ not $ null name
+
+test_glfwGetKeyScancode :: IO ()
+test_glfwGetKeyScancode = do
+    forM_ [c'GLFW_KEY_SLASH, c'GLFW_KEY_PERIOD] $ \k -> do
+        sc <- c'glfwGetKeyScancode k
+        assertBool (mconcat ["Key ", show k, " scancode not found."]) (sc > 0)
+
+    -- According to the docs this should work but it returns 0. This is a GLFW
+    -- bug (at least on OS X).
+    -- c'glfwGetKeyScancode c'GLFW_KEY_UNKNOWN >>= assertEqual "" (-1)
 
 --------------------------------------------------------------------------------
 
@@ -623,13 +759,21 @@ test_clipboard p'win = do
       , "xyz 456 !!!"
       ]
     setGet s = do
-        withCString s $ \p's ->
-          c'glfwSetClipboardString p'win p's
+        withCString s $ c'glfwSetClipboardString p'win
         threadDelay 100000  -- Give it a little time
         p's' <- c'glfwGetClipboardString p'win
-        if p's' == nullPtr
-          then return ""
-          else peekCString p's'
+
+        -- See if we generated a known error for the clipboard, which would
+        -- indicate that the format is not supported.
+        errResult <- c'glfwGetError nullPtr
+        if errResult == c'GLFW_FORMAT_UNAVAILABLE
+          then return s
+          else if errResult == c'GLFW_NO_ERROR then do
+            if p's' == nullPtr
+              then return ""
+              else peekCString p's'
+          else do
+            assertFailure "Unexpected error from clipboard"
 
 --------------------------------------------------------------------------------
 
@@ -642,50 +786,61 @@ test_glfwVulkanSupported =
 test_glfwGetRequiredInstanceExtensions :: IO ()
 test_glfwGetRequiredInstanceExtensions = do
     support <- c'glfwVulkanSupported
-    if (support == 1)
-        then alloca $ \p'count ->
-            c'glfwGetRequiredInstanceExtensions p'count >> return ()
-        else return ()
+    when (support == c'GLFW_TRUE) $
+        alloca $ \p'count -> do
+            p'exts <- c'glfwGetRequiredInstanceExtensions p'count
+            when (p'exts /= nullPtr) $ do
+                count <- peek p'count
+                assertBool "Got at least some extensions" $ count > 0
 
 test_glfwGetInstanceProcAddress :: IO ()
 test_glfwGetInstanceProcAddress = do
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         shouldBeNull <- withCString "notafunction" $
                         \s -> c'glfwGetInstanceProcAddress nullPtr s
         shouldBeNull @?= nullFunPtr
         assertBool "Function pointer is defined!" $
           p'glfwGetInstanceProcAddress /= nullFunPtr
-    else return ()
 
 test_glfwGetPhysicalDevicePresentationSupport :: IO ()
 test_glfwGetPhysicalDevicePresentationSupport = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         shouldBeFalse <-
-          c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
+            c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
         shouldBeFalse @?= c'GLFW_FALSE
+
+        -- If we pass a nullptr for the instance here then we better get a
+        -- GLFW_API_UNAVAILABLE error since we didn't create the instance with
+        -- the proper extensions...
+        alloca $ \p'errMsg ->
+            c'glfwGetError p'errMsg >>=
+                assertEqual "Got proper vulkan error" c'GLFW_API_UNAVAILABLE
+
         assertBool "Function pointer is defined!" $
           p'glfwGetPhysicalDevicePresentationSupport /= nullFunPtr
-    else return ()
 
 test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
 test_glfwCreateWindowSurface p'win = do
     -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
-    if support == 1
-    then do
+    when (support == c'GLFW_TRUE) $ do
         alloca $ \p'surface -> do
           let resPtr = p'surface :: Ptr ()
           shouldNotBeSuccessful <-
             c'glfwCreateWindowSurface nullPtr p'win nullPtr resPtr
           assertBool "c'glfwCreateSurface was successful??" $
             shouldNotBeSuccessful /= 0
+
+        -- The window that we pass here was not created with GLFW_NO_API, so
+        -- the proper error received here seems to be GLFW_INVALID_VALUE
+        alloca $ \p'errMsg ->
+            c'glfwGetError p'errMsg >>=
+                assertEqual "Got proper vulkan error" c'GLFW_INVALID_VALUE
+
         assertBool "Function pointer is defined!" $
           p'glfwCreateWindowSurface /= nullFunPtr
-    else return ()
 
 {-# ANN module "HLint: ignore Use camelCase" #-}
