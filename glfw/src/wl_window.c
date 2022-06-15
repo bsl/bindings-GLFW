@@ -208,8 +208,8 @@ static struct wl_buffer* createShmBuffer(const GLFWimage* image)
     if (fd < 0)
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "Wayland: Creating a buffer file for %d B failed: %m",
-                        length);
+                        "Wayland: Creating a buffer file for %d B failed: %s",
+                        length, strerror(errno));
         return NULL;
     }
 
@@ -217,7 +217,7 @@ static struct wl_buffer* createShmBuffer(const GLFWimage* image)
     if (data == MAP_FAILED)
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "Wayland: mmap failed: %m");
+                        "Wayland: mmap failed: %s", strerror(errno));
         close(fd);
         return NULL;
     }
@@ -312,10 +312,10 @@ static void createDecorations(_GLFWwindow* window)
 
 static void destroyDecoration(_GLFWdecorationWayland* decoration)
 {
-    if (decoration->surface)
-        wl_surface_destroy(decoration->surface);
     if (decoration->subsurface)
         wl_subsurface_destroy(decoration->subsurface);
+    if (decoration->surface)
+        wl_surface_destroy(decoration->surface);
     if (decoration->viewport)
         wp_viewport_destroy(decoration->viewport);
     decoration->surface = NULL;
@@ -796,7 +796,7 @@ static void setCursorImage(_GLFWwindow* window,
         cursorWayland->yhot = image->hotspot_y;
     }
 
-    wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.serial,
+    wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.pointerEnterSerial,
                           surface,
                           cursorWayland->xhot / scale,
                           cursorWayland->yhot / scale);
@@ -870,10 +870,17 @@ static void handleEvents(int timeout)
             if (read_ret != 8)
                 return;
 
-            for (i = 0; i < repeats; ++i)
-                _glfwInputKey(_glfw.wl.keyboardFocus, _glfw.wl.keyboardLastKey,
-                              _glfw.wl.keyboardLastScancode, GLFW_REPEAT,
-                              _glfw.wl.xkb.modifiers);
+            if (_glfw.wl.keyboardFocus)
+            {
+                for (i = 0; i < repeats; ++i)
+                {
+                    _glfwInputKey(_glfw.wl.keyboardFocus,
+                                  _glfw.wl.keyboardLastKey,
+                                  _glfw.wl.keyboardLastScancode,
+                                  GLFW_REPEAT,
+                                  _glfw.wl.xkb.modifiers);
+                }
+            }
         }
 
         if (fds[2].revents & POLLIN)
@@ -1111,8 +1118,10 @@ void _glfwPlatformGetFramebufferSize(_GLFWwindow* window,
                                      int* width, int* height)
 {
     _glfwPlatformGetWindowSize(window, width, height);
-    *width *= window->wl.scale;
-    *height *= window->wl.scale;
+    if (width)
+        *width *= window->wl.scale;
+    if (height)
+        *height *= window->wl.scale;
 }
 
 void _glfwPlatformGetWindowFrameSize(_GLFWwindow* window,
@@ -1538,7 +1547,7 @@ static void lockPointer(_GLFWwindow* window)
     window->wl.pointerLock.relativePointer = relativePointer;
     window->wl.pointerLock.lockedPointer = lockedPointer;
 
-    wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.serial,
+    wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.pointerEnterSerial,
                           NULL, 0, 0);
 }
 
@@ -1602,7 +1611,7 @@ void _glfwPlatformSetCursor(_GLFWwindow* window, _GLFWcursor* cursor)
     }
     else if (window->cursorMode == GLFW_CURSOR_HIDDEN)
     {
-        wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.serial, NULL, 0, 0);
+        wl_pointer_set_cursor(_glfw.wl.pointer, _glfw.wl.pointerEnterSerial, NULL, 0, 0);
     }
 }
 

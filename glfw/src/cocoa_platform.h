@@ -31,7 +31,9 @@
 
 // NOTE: All of NSGL was deprecated in the 10.14 SDK
 //       This disables the pointless warnings for every symbol we use
+#ifndef GL_SILENCE_DEPRECATION
 #define GL_SILENCE_DEPRECATION
+#endif
 
 #if defined(__OBJC__)
 #import <Cocoa/Cocoa.h>
@@ -92,7 +94,7 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 #define _glfw_dlclose(handle) dlclose(handle)
 #define _glfw_dlsym(handle, name) dlsym(handle, name)
 
-#define _GLFW_EGL_NATIVE_WINDOW  ((EGLNativeWindowType) window->ns.view)
+#define _GLFW_EGL_NATIVE_WINDOW  ((EGLNativeWindowType) window->ns.layer)
 #define _GLFW_EGL_NATIVE_DISPLAY EGL_DEFAULT_DISPLAY
 
 #define _GLFW_PLATFORM_WINDOW_STATE         _GLFWwindowNS  ns
@@ -121,6 +123,7 @@ typedef struct _GLFWwindowNS
     id              layer;
 
     GLFWbool        maximized;
+    GLFWbool        occluded;
     GLFWbool        retina;
 
     // Cached window properties to filter out duplicate events
@@ -132,7 +135,6 @@ typedef struct _GLFWwindowNS
     // since the last cursor motion event was processed
     // This is kept to counteract Cocoa doing the same internally
     double          cursorWarpDeltaX, cursorWarpDeltaY;
-
 } _GLFWwindowNS;
 
 // Cocoa-specific global data
@@ -167,7 +169,6 @@ typedef struct _GLFWlibraryNS
         PFN_LMGetKbdType GetKbdType;
         CFStringRef     kPropertyUnicodeKeyLayoutData;
     } tis;
-
 } _GLFWlibraryNS;
 
 // Cocoa-specific per-monitor data
@@ -179,7 +180,6 @@ typedef struct _GLFWmonitorNS
     uint32_t            unitNumber;
     id                  screen;
     double              fallbackRefreshRate;
-
 } _GLFWmonitorNS;
 
 // Cocoa-specific per-cursor data
@@ -187,7 +187,6 @@ typedef struct _GLFWmonitorNS
 typedef struct _GLFWcursorNS
 {
     id              object;
-
 } _GLFWcursorNS;
 
 // Cocoa-specific global timer data
@@ -195,7 +194,6 @@ typedef struct _GLFWcursorNS
 typedef struct _GLFWtimerNS
 {
     uint64_t        frequency;
-
 } _GLFWtimerNS;
 
 
