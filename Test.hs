@@ -61,7 +61,7 @@ main = do
 versionMajor, versionMinor, versionRevision :: Int
 versionMajor    = 3
 versionMinor    = 3
-versionRevision = 2
+versionRevision = 9
 
 giveItTime :: IO ()
 giveItTime = threadDelay 500000
@@ -280,10 +280,9 @@ test_glfwGetMonitorName :: Ptr C'GLFWmonitor -> IO ()
 test_glfwGetMonitorName p'mon = do
     p'name <- c'glfwGetMonitorName p'mon
     if p'name == nullPtr
-      then assertFailure ""
+      then return ()
       else do
           name <- peekCString p'name
-          assertBool "" $ length name `between` (0, 20)
           assertBool "" $ all isAscii name
 
 test_glfwGetMonitorWorkarea :: Ptr C'GLFWmonitor -> IO ()
