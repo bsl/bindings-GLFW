@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.3.9.0
+version:      3.3.9.1
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -137,9 +137,14 @@ library
       c-sources:
         glfw/src/glx_context.c
         glfw/src/xkb_unicode.c
-        glfw/src/linux_joystick.c
         glfw/src/posix_time.c
         glfw/src/posix_thread.c
+      if os(linux)
+        c-sources:
+          glfw/src/linux_joystick.c
+      if os(freebsd)
+        c-sources:
+          glfw/src/null_joystick.c
       if flag(X)
         cc-options: -DBINDINGS_GLFW_USE_X11 -D_GLFW_X11
         c-sources:
