@@ -191,7 +191,7 @@ library
         cc-options: -UGLFW_USE_MENUBAR
       if !flag(MacOSXUseRetina)
         cc-options: -UGLFW_USE_RETINA
-      frameworks: AGL Cocoa OpenGL IOKit CoreFoundation CoreVideo
+      frameworks: Cocoa OpenGL IOKit CoreFoundation CoreVideo
 
     if os(mingw32)
       include-dirs:
