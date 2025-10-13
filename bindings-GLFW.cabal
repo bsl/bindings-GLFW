@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.3.9.3
+version:      3.3.9.4
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -222,7 +222,7 @@ test-suite main
 
   type: exitcode-stdio-1.0
   main-is: Test.hs
-  frameworks: AGL Cocoa OpenGL IOKit CoreFoundation CoreVideo
+  frameworks: Cocoa OpenGL IOKit CoreFoundation CoreVideo
 
   build-depends:
     bindings-GLFW,
