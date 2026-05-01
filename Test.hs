@@ -1,13 +1,19 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- base
 import Control.Concurrent    (threadDelay)
+import Control.Exception     (bracket)
 import Control.Monad         (forM, forM_, when)
+import Data.Bits             (shiftL)
 import Data.Char             (isAscii)
+import Data.Int              (Int32)
 import Data.List             (intercalate, isPrefixOf)
-import Foreign.C.String      (peekCString, withCString)
+import Data.Word             (Word32)
+import Foreign.C.String      (CString, peekCString, withCString)
 import Foreign.C.Types       (CDouble(..))
-import Foreign.Marshal.Alloc (alloca)
-import Foreign.Marshal.Array (peekArray)
-import Foreign.Ptr           (Ptr, nullPtr, nullFunPtr)
+import Foreign.Marshal.Alloc (alloca, allocaBytes)
+import Foreign.Marshal.Array (allocaArray, peekArray)
+import Foreign.Ptr           (FunPtr, Ptr, castFunPtr, castPtr, nullPtr, nullFunPtr)
 import Foreign.Storable      (Storable(..))
 
 -- HUnit
@@ -60,8 +66,8 @@ main = do
 
 versionMajor, versionMinor, versionRevision :: Int
 versionMajor    = 3
-versionMinor    = 3
-versionRevision = 9
+versionMinor    = 4
+versionRevision = 0
 
 giveItTime :: IO ()
 giveItTime = threadDelay 500000
@@ -802,44 +808,139 @@ test_glfwGetInstanceProcAddress = do
         assertBool "Function pointer is defined!" $
           p'glfwGetInstanceProcAddress /= nullFunPtr
 
+-- | Vulkan ABI helpers used by the Vulkan tests below. GLFW 3.4 asserts
+-- @instance != VK_NULL_HANDLE@ on the calls we want to test, so the tests
+-- have to construct a real VkInstance via @glfwGetInstanceProcAddress@.
+-- Struct layouts are hardcoded against the 64-bit Vulkan C ABI.
+
+vkApplicationInfoSize, vkInstanceCreateInfoSize :: Int
+vkApplicationInfoSize    = 48
+vkInstanceCreateInfoSize = 64
+
+-- VK_API_VERSION_1_0 == VK_MAKE_API_VERSION(0, 1, 0, 0).
+vkApiVersion10 :: Word32
+vkApiVersion10 = 1 `shiftL` 22
+
+type PFN_vkCreateInstance =
+    Ptr () -> Ptr () -> Ptr (Ptr ()) -> IO Int32
+
+type PFN_vkDestroyInstance =
+    Ptr () -> Ptr () -> IO ()
+
+type PFN_vkEnumeratePhysicalDevices =
+    Ptr () -> Ptr Word32 -> Ptr (Ptr ()) -> IO Int32
+
+foreign import ccall "dynamic"
+    callVkCreateInstance ::
+        FunPtr PFN_vkCreateInstance -> PFN_vkCreateInstance
+
+foreign import ccall "dynamic"
+    callVkDestroyInstance ::
+        FunPtr PFN_vkDestroyInstance -> PFN_vkDestroyInstance
+
+foreign import ccall "dynamic"
+    callVkEnumeratePhysicalDevices ::
+        FunPtr PFN_vkEnumeratePhysicalDevices -> PFN_vkEnumeratePhysicalDevices
+
+pokeVkApplicationInfo :: Ptr () -> IO ()
+pokeVkApplicationInfo p = do
+    pokeByteOff p 0  (0 :: Word32)         -- VK_STRUCTURE_TYPE_APPLICATION_INFO
+    pokeByteOff p 8  (nullPtr :: Ptr ())   -- pNext
+    pokeByteOff p 16 (nullPtr :: Ptr ())   -- pApplicationName
+    pokeByteOff p 24 (0 :: Word32)         -- applicationVersion
+    pokeByteOff p 32 (nullPtr :: Ptr ())   -- pEngineName
+    pokeByteOff p 40 (0 :: Word32)         -- engineVersion
+    pokeByteOff p 44 vkApiVersion10        -- apiVersion
+
+pokeVkInstanceCreateInfo
+    :: Ptr ()                              -- destination
+    -> Ptr ()                              -- pApplicationInfo
+    -> Word32                              -- enabledExtensionCount
+    -> Ptr CString                         -- ppEnabledExtensionNames
+    -> IO ()
+pokeVkInstanceCreateInfo p pAppInfo extCount pExts = do
+    pokeByteOff p 0  (1 :: Word32)         -- VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO
+    pokeByteOff p 8  (nullPtr :: Ptr ())   -- pNext
+    pokeByteOff p 16 (0 :: Word32)         -- flags
+    pokeByteOff p 24 pAppInfo              -- pApplicationInfo
+    pokeByteOff p 32 (0 :: Word32)         -- enabledLayerCount
+    pokeByteOff p 40 (nullPtr :: Ptr ())   -- ppEnabledLayerNames
+    pokeByteOff p 48 extCount              -- enabledExtensionCount
+    pokeByteOff p 56 pExts                 -- ppEnabledExtensionNames
+
+-- Build a VkInstance enabling the extensions GLFW reports as required, then
+-- destroy it after the action returns (or throws). Pre: glfwVulkanSupported.
+withVulkanInstance :: (Ptr () -> IO a) -> IO a
+withVulkanInstance action = do
+    pCreate <- withCString "vkCreateInstance" $
+        c'glfwGetInstanceProcAddress nullPtr
+    when (pCreate == nullFunPtr) $
+        assertFailure "Couldn't resolve vkCreateInstance via GLFW"
+    let createInst = callVkCreateInstance (castFunPtr pCreate)
+    bracket (acquire createInst) destroy action
+  where
+    acquire createInst =
+        alloca $ \p'extCount -> do
+            p'exts <- c'glfwGetRequiredInstanceExtensions p'extCount
+            extCount <- peek p'extCount
+            allocaBytes vkApplicationInfoSize $ \p'appInfo ->
+                allocaBytes vkInstanceCreateInfoSize $ \p'createInfo -> do
+                    pokeVkApplicationInfo p'appInfo
+                    pokeVkInstanceCreateInfo
+                        p'createInfo p'appInfo extCount p'exts
+                    alloca $ \p'inst -> do
+                        res <- createInst p'createInfo nullPtr p'inst
+                        when (res /= 0) $
+                            assertFailure $
+                                "vkCreateInstance failed with VkResult " ++ show res
+                        peek p'inst
+
+    destroy inst = do
+        pDestroy <- withCString "vkDestroyInstance" $
+            c'glfwGetInstanceProcAddress inst
+        when (pDestroy /= nullFunPtr) $
+            callVkDestroyInstance (castFunPtr pDestroy) inst nullPtr
+
 test_glfwGetPhysicalDevicePresentationSupport :: IO ()
 test_glfwGetPhysicalDevicePresentationSupport = do
-    -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
     when (support == c'GLFW_TRUE) $ do
-        shouldBeFalse <-
-            c'glfwGetPhysicalDevicePresentationSupport nullPtr nullPtr 0
-        shouldBeFalse @?= c'GLFW_FALSE
-
-        -- If we pass a nullptr for the instance here then we better get a
-        -- GLFW_API_UNAVAILABLE error since we didn't create the instance with
-        -- the proper extensions...
-        alloca $ \p'errMsg ->
-            c'glfwGetError p'errMsg >>=
-                assertEqual "Got proper vulkan error" c'GLFW_API_UNAVAILABLE
-
         assertBool "Function pointer is defined!" $
           p'glfwGetPhysicalDevicePresentationSupport /= nullFunPtr
+        withVulkanInstance $ \inst -> do
+            pEnum <- withCString "vkEnumeratePhysicalDevices" $
+                c'glfwGetInstanceProcAddress inst
+            assertBool "vkEnumeratePhysicalDevices resolves" $
+                pEnum /= nullFunPtr
+            let enumPhys = callVkEnumeratePhysicalDevices (castFunPtr pEnum)
+            alloca $ \p'count -> do
+                _ <- enumPhys inst p'count nullPtr
+                count <- peek p'count
+                when (count > 0) $
+                    allocaArray (fromIntegral count) $ \p'devs -> do
+                        _ <- enumPhys inst p'count p'devs
+                        dev <- peek p'devs
+                        -- Just exercise the call path with valid arguments;
+                        -- presentation support for queue family 0 depends on
+                        -- the host. We only care that it doesn't trap.
+                        _ <- c'glfwGetPhysicalDevicePresentationSupport
+                                inst dev 0
+                        return ()
 
 test_glfwCreateWindowSurface :: Ptr C'GLFWwindow -> IO ()
 test_glfwCreateWindowSurface p'win = do
-    -- We don't really have the proper types to test this function
     support <- c'glfwVulkanSupported
     when (support == c'GLFW_TRUE) $ do
-        alloca $ \p'surface -> do
-          let resPtr = p'surface :: Ptr ()
-          shouldNotBeSuccessful <-
-            c'glfwCreateWindowSurface nullPtr p'win nullPtr resPtr
-          assertBool "c'glfwCreateSurface was successful??" $
-            shouldNotBeSuccessful /= 0
-
-        -- The window that we pass here was not created with GLFW_NO_API, so
-        -- the proper error received here seems to be GLFW_INVALID_VALUE
-        alloca $ \p'errMsg ->
-            c'glfwGetError p'errMsg >>=
-                assertEqual "Got proper vulkan error" c'GLFW_INVALID_VALUE
-
         assertBool "Function pointer is defined!" $
           p'glfwCreateWindowSurface /= nullFunPtr
+        withVulkanInstance $ \inst ->
+            alloca $ \(p'surface :: Ptr (Ptr ())) -> do
+                -- The test window was created with the default OpenGL client
+                -- API, so GLFW returns VK_ERROR_NATIVE_WINDOW_IN_USE_KHR and
+                -- emits GLFW_INVALID_VALUE.
+                _ <- c'glfwCreateWindowSurface
+                        inst p'win nullPtr (castPtr p'surface)
+                c'glfwGetError nullPtr >>=
+                    assertEqual "Got proper vulkan error" c'GLFW_INVALID_VALUE
 
 {-# ANN module "HLint: ignore Use camelCase" #-}

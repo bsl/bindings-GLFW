@@ -52,7 +52,7 @@ import Data.Int              (Int32)
 import Data.Word             (Word32, Word64)
 import Data.Typeable         (Typeable)
 import Foreign.C.Types       (CChar, CUChar, CUShort)
-import Foreign.C.Types       (CDouble(..), CFloat(..), CInt(..), CUInt(..))
+import Foreign.C.Types       (CDouble(..), CFloat(..), CInt(..), CSize(..), CUInt(..))
 import Foreign.C.String      (CString)
 import Foreign.Marshal.Array (peekArray,pokeArray)
 import Foreign.Ptr           (FunPtr, nullFunPtr, Ptr, plusPtr)
@@ -591,6 +591,77 @@ deriving instance Data     C'GLFWcursor
 #ccall glfwRawMouseMotionSupported       , IO CInt
 
 --------------------------------------------------------------------------------
+-- GLFW 3.4 additions
+--------------------------------------------------------------------------------
+
+#if (GLFW_VERSION_MAJOR > 3) || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4)
+
+#num GLFW_PLATFORM
+#num GLFW_ANY_PLATFORM
+#num GLFW_PLATFORM_WIN32
+#num GLFW_PLATFORM_COCOA
+#num GLFW_PLATFORM_WAYLAND
+#num GLFW_PLATFORM_X11
+#num GLFW_PLATFORM_NULL
+
+#num GLFW_PLATFORM_UNAVAILABLE
+#num GLFW_FEATURE_UNAVAILABLE
+#num GLFW_FEATURE_UNIMPLEMENTED
+#num GLFW_CURSOR_UNAVAILABLE
+
+#num GLFW_RESIZE_NWSE_CURSOR
+#num GLFW_RESIZE_NESW_CURSOR
+#num GLFW_RESIZE_ALL_CURSOR
+#num GLFW_RESIZE_EW_CURSOR
+#num GLFW_RESIZE_NS_CURSOR
+#num GLFW_NOT_ALLOWED_CURSOR
+#num GLFW_POINTING_HAND_CURSOR
+
+#num GLFW_MOUSE_PASSTHROUGH
+#num GLFW_CONTEXT_DEBUG
+#num GLFW_CURSOR_CAPTURED
+#num GLFW_POSITION_X
+#num GLFW_POSITION_Y
+#num GLFW_ANY_POSITION
+#num GLFW_SCALE_FRAMEBUFFER
+
+#num GLFW_ANGLE_PLATFORM_TYPE
+#num GLFW_ANGLE_PLATFORM_TYPE_NONE
+#num GLFW_ANGLE_PLATFORM_TYPE_OPENGL
+#num GLFW_ANGLE_PLATFORM_TYPE_OPENGLES
+#num GLFW_ANGLE_PLATFORM_TYPE_D3D9
+#num GLFW_ANGLE_PLATFORM_TYPE_D3D11
+#num GLFW_ANGLE_PLATFORM_TYPE_VULKAN
+#num GLFW_ANGLE_PLATFORM_TYPE_METAL
+
+#num GLFW_X11_XCB_VULKAN_SURFACE
+#num GLFW_WAYLAND_APP_ID
+#num GLFW_WAYLAND_LIBDECOR
+#num GLFW_WAYLAND_PREFER_LIBDECOR
+#num GLFW_WAYLAND_DISABLE_LIBDECOR
+#num GLFW_WIN32_KEYBOARD_MENU
+#num GLFW_WIN32_SHOWDEFAULT
+
+#callback GLFWallocatefun   , CSize -> Ptr () -> IO (Ptr ())
+#callback GLFWreallocatefun , Ptr () -> CSize -> Ptr () -> IO (Ptr ())
+#callback GLFWdeallocatefun , Ptr () -> Ptr () -> IO ()
+
+#starttype GLFWallocator
+#field allocate   , <GLFWallocatefun>
+#field reallocate , <GLFWreallocatefun>
+#field deallocate , <GLFWdeallocatefun>
+#field user       , Ptr ()
+#stoptype
+
+#ccall glfwInitAllocator     , Ptr <GLFWallocator> -> IO ()
+#ccall glfwInitVulkanLoader  , FunPtr vkProc -> IO ()
+#ccall glfwGetPlatform       , IO CInt
+#ccall glfwPlatformSupported , CInt -> IO CInt
+#ccall glfwGetWindowTitle    , Ptr <GLFWwindow> -> IO (Ptr CChar)
+
+#endif
+
+--------------------------------------------------------------------------------
 -- Native APIs
 --------------------------------------------------------------------------------
 
@@ -640,6 +711,9 @@ c'glfwGetWGLContext =
 #if defined(GLFW_EXPOSE_NATIVE_COCOA)
 #ccall glfwGetCocoaMonitor , Ptr <GLFWwindow> -> IO (Ptr Word32)
 #ccall glfwGetCocoaWindow , Ptr <GLFWwindow> -> IO (Ptr ())
+#if (GLFW_VERSION_MAJOR > 3) || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4)
+#ccall glfwGetCocoaView , Ptr <GLFWwindow> -> IO (Ptr ())
+#endif
 #else
 p'glfwGetCocoaMonitor :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr Word32))
 p'glfwGetCocoaMonitor = nullFunPtr
@@ -656,6 +730,16 @@ c'glfwGetCocoaWindow :: Ptr C'GLFWwindow -> IO (Ptr ())
 c'glfwGetCocoaWindow =
   error $ "c'glfwGetCocoaWindow undefined! -- "
        ++ "Did you use the wrong glfw3native API?"
+
+#if (GLFW_VERSION_MAJOR > 3) || (GLFW_VERSION_MAJOR == 3 && GLFW_VERSION_MINOR >= 4)
+p'glfwGetCocoaView :: FunPtr (Ptr C'GLFWwindow -> IO (Ptr ()))
+p'glfwGetCocoaView = nullFunPtr
+
+c'glfwGetCocoaView :: Ptr C'GLFWwindow -> IO (Ptr ())
+c'glfwGetCocoaView =
+  error $ "c'glfwGetCocoaView undefined! -- "
+       ++ "Did you use the wrong glfw3native API?"
+#endif
 #endif
 
 #if defined(GLFW_EXPOSE_NATIVE_NSGL)

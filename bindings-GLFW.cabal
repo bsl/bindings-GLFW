@@ -1,5 +1,5 @@
 name:         bindings-GLFW
-version:      3.3.9.4
+version:      3.4.0.0
 category:     Graphics
 
 author:       Brian Lewis <brian@lorf.org>
@@ -17,16 +17,11 @@ description:
   multi-platform library for creating windows with OpenGL contexts and managing
   input and events.
   .
-  The binding is to GLFW 3.3, released 2019-04-15
-  (<http://www.glfw.org/Version-3.3-released.html>
-  <http://www.glfw.org/changelog.html>).
+  The binding is to GLFW 3.4, released 2024-02-23
+  (<https://www.glfw.org/docs/3.4/news.html>).
   .
   /These bindings are too low-level for normal use./ For higher-level bindings,
   see GLFW-b (<http://hackage.haskell.org/package/GLFW-b>).
-  .
-  If you've used GLFW before, you were probably using 2.7.x. There are some
-  significant differences in 3.x.x. Please see the transition guide
-  (<http://www.glfw.org/docs/3.3/moving.html>).
 
 cabal-version: >= 1.10
 build-type:    Simple
@@ -113,7 +108,7 @@ library
 
   if flag(system-glfw)
     pkgconfig-depends:
-      glfw3 == 3.3.*
+      glfw3 >= 3.3 && < 4
   else
     include-dirs:
       glfw/include/GLFW
@@ -127,7 +122,12 @@ library
       glfw/src/init.c
       glfw/src/input.c
       glfw/src/monitor.c
+      glfw/src/null_init.c
+      glfw/src/null_joystick.c
+      glfw/src/null_monitor.c
+      glfw/src/null_window.c
       glfw/src/osmesa_context.c
+      glfw/src/platform.c
       glfw/src/vulkan.c
       glfw/src/window.c
       glfw/deps/glad_gl.c
@@ -135,19 +135,20 @@ library
 
     if os(linux) || os(freebsd)
       c-sources:
-        glfw/src/glx_context.c
-        glfw/src/xkb_unicode.c
-        glfw/src/posix_time.c
+        glfw/src/posix_module.c
         glfw/src/posix_thread.c
+        glfw/src/posix_time.c
       if os(linux)
         c-sources:
           glfw/src/linux_joystick.c
-      if os(freebsd)
+      if flag(X) || flag(Wayland)
         c-sources:
-          glfw/src/null_joystick.c
+          glfw/src/posix_poll.c
+          glfw/src/xkb_unicode.c
       if flag(X)
         cc-options: -DBINDINGS_GLFW_USE_X11 -D_GLFW_X11
         c-sources:
+          glfw/src/glx_context.c
           glfw/src/x11_init.c
           glfw/src/x11_monitor.c
           glfw/src/x11_window.c
@@ -159,11 +160,6 @@ library
           glfw/src/wl_window.c
       if flag(OSMesa)
         cc-options: -DBINDINGS_GLFW_USE_OSMESA -D_GLFW_OSMESA
-        c-sources:
-          glfw/src/null_init.c
-          glfw/src/null_joystick.c
-          glfw/src/null_monitor.c
-          glfw/src/null_window.c
 
       extra-libraries:
         GL
@@ -178,6 +174,7 @@ library
     if os(darwin)
       c-sources:
          glfw/src/cocoa_time.c
+         glfw/src/posix_module.c
          glfw/src/posix_thread.c
          glfw/src/cocoa_init.m
          glfw/src/cocoa_joystick.m
@@ -199,15 +196,16 @@ library
       c-sources:
         glfw/src/win32_init.c
         glfw/src/win32_joystick.c
+        glfw/src/win32_module.c
         glfw/src/win32_monitor.c
+        glfw/src/win32_thread.c
         glfw/src/win32_time.c
         glfw/src/win32_window.c
-        glfw/src/win32_thread.c
         glfw/src/wgl_context.c
       extra-libraries:
         opengl32
         Gdi32
-      cc-options: -D_GLFW_WIN32
+      cc-options: -D_GLFW_WIN32 -DUNICODE -D_UNICODE
 
   if flag(ExposeNative)
     cc-options: -DExposeNative
