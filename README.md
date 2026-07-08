@@ -9,7 +9,7 @@ Low-level [Haskell][1] bindings to [GLFW][2], an open source, multi-platform
 library for creating windows with OpenGL contexts and managing input and
 events.
 
-The binding is to [GLFW 3.3.9 released 2023-12-13][3].
+The binding is to [GLFW 3.4 released 2024-02-23][3].
 
 *These bindings are a lot lower level than intended for normal use.*
 For higher-level GLFW bindings, see [GLFW-b][4].
@@ -24,5 +24,5 @@ Thank you, and happy coding.
 
 [1]: http://www.haskell.org/
 [2]: http://www.glfw.org/
-[3]: http://www.glfw.org/Version-3.3-released.html
+[3]: https://www.glfw.org/docs/3.4/news.html
 [4]: https://github.com/bsl/GLFW-b
